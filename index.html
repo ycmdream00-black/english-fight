@@ -140,6 +140,9 @@ const CONFIG = {
     son: { name: "아들(시현)", emoji: "🐯" }
   },
   resultHour: 22,                // 결과 발표 시각(한국 시간)
+  quietHours: { from: 23, to: 15 }, // 푸시 금지 시간(23시~다음날 15시). 이 시간에 생긴 알림은 15시에 보냄
+  nagEveryMinutes: 60,           // 상대가 다 풀 때까지 재촉 알림 간격
+  lastCall: { h: 21, m: 30 },    // 마감 알림 시각
   startDate: "2026-11-08",       // 단어 진도 1일차
   newWordsPerDay: 8,
   reviewWordsPerDay: 4,
@@ -1346,17 +1349,61 @@ const DB = DEMO ? LocalDB : RemoteDB;
 
 /* ===================== 알림 (ntfy) ===================== */
 function appLink() { return CONFIG.appUrl || (location.origin + location.pathname); }
+function pushTime(t) {
+  const q = CONFIG.quietHours; if (!q) return t;
+  const p = kst(new Date(t)), h = +p.hour, k = `${p.year}-${p.month}-${p.day}`;
+  const wrap = q.from > q.to, inQ = wrap ? (h >= q.from || h < q.to) : (h >= q.from && h < q.to);
+  if (!inQ) return t;
+  return (wrap && h >= q.from) ? kstTime(dateAdd(k, 1), q.to) : kstTime(k, q.to);
+}
+function kstAt(k, h, m) { return kstTime(k, h) + m * 60000; }
+const hhmm = t => new Date(t).toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", hour12: false });
+const NTFY = () => CONFIG.ntfyServer.replace(/\/$/, "");
+async function publish(topic, title, message, opt) {
+  const delay = opt.at && opt.at > now() + 15000 ? String(Math.floor(opt.at / 1000)) : "";
+  if (opt.seq) {
+    const qs = new URLSearchParams({ title, tags: (opt.tags || []).join(","), priority: String(opt.priority || 3), click: appLink() });
+    if (delay) qs.set("delay", delay);
+    try { const r = await fetch(`${NTFY()}/${topic}/${encodeURIComponent(opt.seq)}?${qs}`, { method: "POST", body: message }); if (r.ok) return true; } catch (e) {}
+  }
+  const body = { topic, title, message, tags: opt.tags || [], priority: opt.priority || 3, click: appLink() };
+  if (delay) body.delay = delay;
+  try { const r = await fetch(NTFY() + "/", { method: "POST", body: JSON.stringify(body) }); return r.ok; } catch (e) { console.warn("ntfy", e); return false; }
+}
+/* opt: at(예약 시각 ms), seq(취소용 ID), quiet(false면 금지 시간 무시), tags, priority, silent */
 async function notify(targets, title, message, opt = {}) {
+  if (opt.quiet !== false) opt = Object.assign({}, opt, { at: pushTime(opt.at || now()) });
   const sendable = targets.filter(p => CONFIG.ntfyTopics[p]);
   if (DEMO || !sendable.length) {
-    if (!opt.silent) toast(`📣 ${opt.at ? "(" + new Date(opt.at).toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit" }) + " 예약) " : ""}${title} — ${message}` + (DEMO ? " (체험 모드라 실제 알림은 안 가요)" : ""));
+    if (!opt.silent) toast(`📣 ${opt.at && opt.at > now() + 15000 ? "(" + hhmm(opt.at) + " 예약) " : ""}${title} — ${message}` + (DEMO ? " (체험 모드라 실제 알림은 안 가요)" : ""));
     return;
   }
-  for (const p of sendable) {
-    const body = { topic: CONFIG.ntfyTopics[p], title, message, tags: opt.tags || [], priority: opt.priority || 3, click: appLink() };
-    if (opt.at && opt.at > now() + 15000) body.delay = String(Math.floor(opt.at / 1000));
-    try { await fetch(CONFIG.ntfyServer.replace(/\/$/, "") + "/", { method: "POST", body: JSON.stringify(body) }); } catch (e) { console.warn("ntfy", e); }
+  for (const p of sendable) await publish(CONFIG.ntfyTopics[p], title, message, opt);
+}
+async function cancelPush(p, seqs) {
+  if (DEMO || !CONFIG.ntfyTopics[p]) return;
+  await Promise.all(seqs.map(q => fetch(`${NTFY()}/${CONFIG.ntfyTopics[p]}/${encodeURIComponent(q)}`, { method: "DELETE" }).catch(() => {})));
+}
+const nagSeqs = d => [`done-${d}`, ...Array.from({ length: 12 }, (_, i) => `nag-${d}-${i + 1}`), `last-${d}`];
+/* 내가 다 풀었고 상대는 아직일 때: 첫 알림 + 1시간마다 재촉 + 마감 알림 예약 */
+async function scheduleNags(d) {
+  const me = P(S.me), oppId = other(S.me), opp = P(oppId);
+  const first = pushTime(now()), last = kstAt(d, CONFIG.lastCall.h, CONFIG.lastCall.m), times = [];
+  if (first < revealAt(d)) {
+    await notify([oppId], `${me.emoji} ${josa(me.name, "이", "가")} 다 풀었어!`, `오늘 영어 대결 끝! ${opp.name}도 빨리 도전해! 🔥 (마감 밤 ${HOUR_TXT})`, { at: first, seq: `done-${d}`, tags: ["fire"], priority: 4, silent: DEMO });
+    times.push(first);
   }
+  const step = (CONFIG.nagEveryMinutes || 60) * 60000;
+  for (let t = first + step, i = 1; t < last - 15 * 60000 && i <= 12; t += step, i++) {
+    await notify([oppId], `⏰ ${opp.name}, 아직이야?`, `${josa(me.name, "은", "는")} 벌써 끝냈어! 마감은 밤 ${HOUR_TXT}. 빨리 도전해! 🔥`, { at: t, seq: `nag-${d}-${i}`, tags: ["alarm_clock"], priority: 4, silent: DEMO });
+    times.push(t);
+  }
+  if (now() < last) {
+    await notify([oppId], "⏰ 마감 30분 남았어!", `오늘 영어 대결이 밤 ${HOUR_TXT}에 마감돼요. 지금 바로 풀어요! 🏃`, { at: last, seq: `last-${d}`, tags: ["rotating_light"], priority: 5, silent: DEMO });
+    times.push(last);
+  }
+  if (DEMO) toast(`📣 (체험) ${opp.name}에게 알림 예약: ${times.map(hhmm).join(", ")}`, 6000);
+  return times;
 }
 
 /* ===================== 소리 ===================== */
@@ -1562,7 +1609,9 @@ function viewSet() {
   <div class="card"><h3>🔊 효과음 (내 폰만)</h3><button class="btn sec small" data-act="sound">${LS.get("duel-sound", true) ? "켜짐 (누르면 끔)" : "꺼짐 (누르면 켬)"}</button></div>
   <div class="card"><h3>🎁 상품 ${lock}</h3>${prizes}</div>
   <div class="card"><h3>📡 연결 상태</h3><div class="sub">${DEMO ? "체험 모드 (서버 없음)" : "서버 연결: Firebase · 방 " + esc(CONFIG.room)}<br>알림: ${CONFIG.ntfyTopics[S.me] ? "ntfy 토픽 " + esc(CONFIG.ntfyTopics[S.me]) : "설정 안 됨"}</div>
-  ${!DEMO && CONFIG.ntfyTopics[S.me] ? `<button class="btn sec small" data-act="testPush">내 폰에 테스트 알림 보내기</button>` : ""}</div>
+  ${!DEMO && CONFIG.ntfyTopics[S.me] ? `<button class="btn sec small" data-act="testPush">내 폰에 테스트 알림 보내기</button>` : ""}
+  ${!DEMO && adm && CONFIG.ntfyTopics[S.me] ? `<button class="btn sec small" data-act="testCancel">알림 예약·취소 테스트 (1분 걸림)</button>` : ""}
+  <div class="sub" style="margin-top:6px">🔕 푸시 금지: ${CONFIG.quietHours.from}시~${CONFIG.quietHours.to}시 · 재촉 ${CONFIG.nagEveryMinutes}분마다 · 마감 알림 ${CONFIG.lastCall.h}:${String(CONFIG.lastCall.m).padStart(2, "0")}</div></div>
   ${DEMO_OR_TEST() && (adm || DEMO) ? `<div class="card"><h3>🧪 테스트 도구</h3>
   <button class="btn sec small" data-act="revealNow">${LS.get("duel-reveal-now", false) ? "✅ 결과 바로 공개 중 (누르면 끔)" : "결과 바로 공개하기 (10시 안 기다림)"}</button>
   <button class="btn sec small" data-act="fakeOpp">상대 기록 가짜로 만들기 (오늘)</button>
@@ -1787,17 +1836,19 @@ async function finishGame() {
   let oppDone = false;
   try { const o = await DB.get(resPath(g.date, other(S.me))); oppDone = !!(o && o.status === "done"); } catch (e) {}
   const me = P(S.me), opp = P(other(S.me));
+  let nagTimes = [];
   if (!oppDone) {
-    await notify([other(S.me)], `${me.emoji} ${josa(me.name, "이", "가")} 다 풀었어!`, `오늘 영어 대결 끝! ${opp.name}도 빨리 도전해! 🔥 (마감 밤 ${HOUR_TXT})`, { tags: ["fire"], priority: 4 });
-    if (isOpen(g.date)) await notify(PIDS, "🏆 오늘의 결과 발표!", "누가 이겼을까? 앱을 열어서 확인해 보세요 👀", { at: revealAt(g.date), tags: ["trophy"], priority: 4, silent: !DEMO });
+    nagTimes = await scheduleNags(g.date);
+    if (isOpen(g.date)) await notify(PIDS, "🏆 오늘의 결과 발표!", "누가 이겼을까? 앱을 열어서 확인해 보세요 👀", { at: revealAt(g.date), seq: `res-${g.date}`, tags: ["trophy"], priority: 4, silent: true });
   } else {
-    await notify([other(S.me)], `${me.emoji} ${me.name}도 다 풀었어!`, `둘 다 끝! 결과는 밤 ${HOUR_TXT}에 공개돼요 🔒`, { tags: ["lock"] });
+    await cancelPush(S.me, nagSeqs(g.date));   // 나한테 예약돼 있던 재촉 알림 취소
+    await notify([other(S.me)], `${me.emoji} ${me.name}도 다 풀었어!`, `둘 다 끝! 결과는 밤 ${HOUR_TXT}에 공개돼요 🔒`, { tags: ["lock"], silent: DEMO });
   }
   confetti(30); SFX.win();
   const wl = doc.wrongWords;
   app.innerHTML = `<div class="center" style="padding-top:24px"><div style="font-size:70px">🎉</div><h1>오늘 도전 완료!</h1>
   <div class="count" style="font-size:52px">${doc.score}점</div><div class="sub">정답 ${correct}/${g.qs.length} · ${fmtSec(timeMs)} · 최고 콤보 ${g.maxCombo}${bonus ? ` · 핸디캡 +${bonus}` : ""}</div></div>
-  <div class="card center">${oppDone ? `📣 ${esc(opp.name)}에게 "나도 끝!" 알림을 보냈어요.<br>` : `📣 ${esc(opp.name)}에게 "빨리 풀어!" 알림을 보냈어요.<br>`}<b>결과는 오늘 밤 ${HOUR_TXT}에 공개!</b>${saved ? "" : `<br><span style="color:var(--bad)">⚠️ 서버 저장 실패 — 인터넷 연결 후 앱을 다시 열어 주세요</span>`}</div>
+  <div class="card center">${oppDone ? `📣 ${esc(opp.name)}에게 "나도 끝!" 알림을 보냈어요.<br>` : nagTimes.length ? `📣 ${esc(opp.name)}에게 "빨리 풀어!" 알림 예정<br><span class="sub">${nagTimes.map(hhmm).join(" · ")}<br>(${esc(opp.name)}이 다 풀면 남은 알림은 자동 취소)</span><br>` : ""}<b>결과는 오늘 밤 ${HOUR_TXT}에 공개!</b>${saved ? "" : `<br><span style="color:var(--bad)">⚠️ 서버 저장 실패 — 인터넷 연결 후 앱을 다시 열어 주세요</span>`}</div>
   <div class="card"><h3>📒 오늘의 오답노트</h3>${wl.length ? wl.map(w => wordCard(w)).join("") : `<div class="sub">하나도 안 틀렸어요! 🏅</div>`}</div>
   <button class="btn" data-act="home">홈으로</button>`;
   if (!saved) LS.set("duel-unsaved", doc);
@@ -1841,7 +1892,15 @@ const ACT = {
     try { await DB.set("meta/settings", st); S.settings = st; toast("저장했어요 ✅"); } catch (e) { toast("저장 실패: " + e.message); }
     render();
   },
-  testPush() { notify([S.me], "🔔 테스트 알림", "알림이 잘 와요! 오늘도 영어 대결 화이팅 💪", { tags: ["bell"] }); toast("보냈어요. 몇 초 안에 알림이 와야 해요."); },
+  async testCancel() {
+    const t = CONFIG.ntfyTopics[S.me], id = Date.now().toString(36), at = now() + 60000;
+    await publish(t, "✅ 테스트 A (와야 정상)", "예약 알림이 잘 와요", { at, seq: "ta-" + id });
+    await publish(t, "❌ 테스트 B (오면 안 됨)", "이 알림이 오면 취소 기능이 안 되는 거예요", { at, seq: "tb-" + id });
+    await new Promise(r => setTimeout(r, 2500));
+    await cancelPush(S.me, ["tb-" + id]);
+    toast("1분 뒤 '테스트 A' 하나만 오면 정상이에요. B도 오면 알려 주세요.", 6000);
+  },
+  testPush() { notify([S.me], "🔔 테스트 알림", "알림이 잘 와요! 오늘도 영어 대결 화이팅 💪", { tags: ["bell"], quiet: false }); toast("보냈어요. 몇 초 안에 알림이 와야 해요."); },
   revealNow() { LS.set("duel-reveal-now", !LS.get("duel-reveal-now", false)); render(); },
   async fakeOpp() { if (!isAdmin() && !DEMO) return; const d = todayKey(), p = other(S.me); const correct = 7 + Math.floor(Math.random() * 6); await DB.set(resPath(d, p), fakeDoc(d, p, correct)); await loadAll(); render(); toast(`${P(p).name} 기록을 만들었어요`); },
   async resetToday() { if (!isAdmin() && !DEMO) return; const d = todayKey(); await DB.del(resPath(d, S.me)); LS.del(progKey(d)); await loadAll(); render(); toast("오늘 내 기록을 지웠어요"); },
