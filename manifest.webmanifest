@@ -1,0 +1,17 @@
+{
+  "name": "영어 5분 대결",
+  "short_name": "영어대결",
+  "description": "아빠와 아들의 매일 5분 영어 단어 대결",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#14123a",
+  "theme_color": "#14123a",
+  "lang": "ko",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#14123a">
+<title>영어 5분 대결</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#14123a; --bg2:#1f1c52; --card:#2a2669; --card2:#352f80; --line:#4a43a3;
+  --txt:#f4f2ff; --sub:#b9b3ea; --dad:#4fc3ff; --son:#ffb340;
+  --ok:#3ddc84; --bad:#ff5c7a; --gold:#ffd54a; --accent:#a67bff;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;}
+body{min-height:100vh;overscroll-behavior:none;user-select:none;-webkit-user-select:none}
+#app{max-width:520px;margin:0 auto;padding:14px 14px 90px;min-height:100vh}
+.jua,h1,h2,h3,.big{font-family:"Jua",-apple-system,sans-serif;font-weight:400}
+h1{font-size:26px;margin:4px 0}
+h2{font-size:21px;margin:18px 0 8px}
+h3{font-size:18px;margin:12px 0 6px}
+.sub{color:var(--sub);font-size:14px}
+.card{background:var(--card);border-radius:18px;padding:16px;margin:10px 0;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.center{text-align:center}
+.btn{display:block;width:100%;border:0;border-radius:16px;padding:16px;font-size:20px;font-family:"Jua",sans-serif;color:#1a1640;background:var(--gold);box-shadow:0 5px 0 #b8901a;margin:10px 0;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #b8901a}
+.btn.sec{background:var(--card2);color:var(--txt);box-shadow:0 5px 0 #1d1950}
+.btn.small{font-size:16px;padding:11px}
+.btn[disabled]{opacity:.45}
+.banner{background:#5b3a00;color:#ffe2a8;border-radius:12px;padding:8px 12px;font-size:13px;margin-bottom:8px}
+.tabs{position:fixed;left:0;right:0;bottom:0;background:#0e0c2b;display:flex;justify-content:center;border-top:1px solid #2c2870;z-index:20}
+.tabs button{flex:1;max-width:130px;background:none;border:0;color:var(--sub);padding:9px 0 12px;font-size:12px}
+.tabs button b{display:block;font-size:22px;font-weight:400}
+.tabs button.on{color:var(--gold)}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px}
+.pl{background:var(--bg2);border-radius:16px;padding:12px 6px;text-align:center;border:3px solid transparent}
+.pl.dad{border-color:var(--dad)} .pl.son{border-color:var(--son)}
+.pl .emo{font-size:42px;line-height:1.1}
+.pl .nm{font-family:"Jua";font-size:19px}
+.pl .st{font-size:13px;color:var(--sub);margin-top:4px}
+.pl .sc{font-family:"Jua";font-size:26px;margin-top:4px}
+.vsmark{font-family:"Jua";font-size:28px;color:var(--accent)}
+.crown{font-size:26px;display:block;height:30px}
+.count{font-family:"Jua";font-size:24px;color:var(--gold)}
+.pill{display:inline-block;background:var(--card2);border-radius:99px;padding:3px 10px;font-size:12px;margin:2px}
+/* quiz */
+.qtop{display:flex;justify-content:space-between;align-items:center;font-family:"Jua";font-size:17px}
+.typetag{background:var(--accent);color:#fff;border-radius:99px;padding:4px 12px;font-size:15px}
+.timer{height:14px;background:#0e0c2b;border-radius:99px;overflow:hidden;margin:10px 0}
+.timer>div{height:100%;background:linear-gradient(90deg,var(--ok),var(--gold));border-radius:99px;transform-origin:left}
+.timer.hurry>div{background:var(--bad)}
+.combo{text-align:center;font-family:"Jua";color:#ff8a3d;font-size:18px;animation:pop .4s}
+.prompt{font-family:"Jua";font-size:40px;text-align:center;margin:22px 0 6px;word-break:break-all}
+.prompt.ko{font-size:32px}
+.hint{text-align:center;color:var(--sub);font-size:15px;margin-bottom:12px}
+.opts{display:grid;gap:10px;margin-top:16px}
+.opt{border:0;border-radius:16px;background:var(--card2);color:var(--txt);font-size:21px;padding:16px 10px;box-shadow:0 5px 0 #1d1950;font-family:"Jua",sans-serif}
+.opt:active{transform:translateY(3px);box-shadow:0 2px 0 #1d1950}
+.opt.good{background:var(--ok);color:#06291a}
+.opt.badc{background:var(--bad)}
+.ox{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+.ox .opt{font-size:54px;padding:20px 0}
+.sentence{font-size:22px;line-height:1.5;text-align:center;background:var(--bg2);border-radius:16px;padding:18px 12px;margin:16px 0;user-select:none}
+.sentence u{color:var(--gold);text-decoration:none;letter-spacing:2px}
+.speaker{display:block;margin:16px auto;width:120px;height:120px;border-radius:50%;border:0;font-size:56px;background:var(--accent);box-shadow:0 6px 0 #5d3fb0}
+.speaker:active{transform:translateY(4px);box-shadow:0 2px 0 #5d3fb0}
+.slots{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:18px 0}
+.slot{width:38px;height:48px;border-radius:10px;background:var(--bg2);border-bottom:4px solid var(--line);font-family:"Jua";font-size:28px;display:flex;align-items:center;justify-content:center}
+.slot.f{background:#fff;color:#1a1640;border-color:#ccc}
+.tiles{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.tile{width:48px;height:52px;border-radius:12px;border:0;background:var(--gold);color:#1a1640;font-family:"Jua";font-size:28px;box-shadow:0 4px 0 #b8901a}
+.tile:disabled{opacity:.15}
+.kb{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.kb .r{display:flex;justify-content:center;gap:4px}
+.kb button{flex:1;max-width:44px;height:48px;border:0;border-radius:8px;background:var(--card2);color:var(--txt);font-size:20px;font-family:"Jua";box-shadow:0 3px 0 #1d1950}
+.kb button.wide{max-width:84px;flex:2;font-size:16px}
+.kb button.go{background:var(--ok);color:#06291a}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.match .col{display:grid;gap:10px}
+.mi{border:0;border-radius:14px;padding:14px 6px;font-size:19px;background:var(--card2);color:var(--txt);font-family:"Jua";box-shadow:0 4px 0 #1d1950;min-height:58px}
+.mi.sel{background:var(--accent)}
+.mi.done{background:var(--ok);color:#06291a;opacity:.55}
+.mi.err{background:var(--bad)}
+.shake{animation:shake .35s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.overlay{position:fixed;inset:0;background:rgba(10,8,35,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;padding:24px;text-align:center}
+.overlay .huge{font-size:84px;animation:pop .3s}
+.overlay .msg{font-family:"Jua";font-size:28px;margin-top:6px}
+.overlay .ans{font-size:20px;margin-top:10px;color:var(--sub)}
+.overlay .ans b{color:var(--txt);font-size:26px}
+.cd{font-family:"Jua";font-size:120px;color:var(--gold);animation:pop .5s}
+/* study */
+.wcard{background:var(--bg2);border-radius:14px;padding:12px;margin:8px 0;display:flex;gap:10px;align-items:center}
+.wcard .w{font-family:"Jua";font-size:24px}
+.wcard .m{color:var(--gold);font-size:16px}
+.wcard .s{color:var(--sub);font-size:13px;margin-top:3px}
+.wcard .s b{color:var(--txt)}
+.wcard .spk{margin-left:auto;border:0;background:var(--card2);border-radius:12px;font-size:22px;width:46px;height:46px;flex:none}
+.tag{font-size:11px;border-radius:6px;padding:2px 6px;background:var(--accent);color:#fff;margin-left:6px;vertical-align:middle}
+.tag.rv{background:#ff8a3d}
+table{width:100%;border-collapse:collapse;font-size:15px}
+td,th{padding:9px 4px;border-bottom:1px solid #3a3488;text-align:center}
+th{color:var(--sub);font-weight:400;font-size:13px}
+tr.click:active{background:var(--card2)}
+.trophy{font-size:54px;text-align:center}
+.prize{background:linear-gradient(135deg,#ffd54a,#ff9f43);color:#3a2300;border-radius:14px;padding:10px 14px;font-family:"Jua";font-size:17px;margin-top:8px}
+input.txt{width:100%;padding:12px;border-radius:12px;border:2px solid var(--line);background:var(--bg2);color:var(--txt);font-size:16px;margin:4px 0 10px}
+.toast{position:fixed;left:50%;top:16px;transform:translateX(-50%);background:#fff;color:#1a1640;padding:12px 16px;border-radius:14px;z-index:99;font-size:15px;box-shadow:0 6px 20px rgba(0,0,0,.4);max-width:90%;animation:pop .3s}
+.confetti{position:fixed;top:-40px;font-size:28px;z-index:60;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+.bar2{height:10px;border-radius:99px;background:#0e0c2b;overflow:hidden;display:flex;margin:8px 0}
+.bar2 .d{background:var(--dad)} .bar2 .s{background:var(--son)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* =====================================================================
+   ⚙️ 설정 — 설치할 때 여기만 고치면 됩니다 (SETUP.md 참고)
+   ===================================================================== */
+const CONFIG = {
+  // Firebase 프로젝트 ID. 비워두면 '체험 모드'(이 기기 안에서만 저장)로 동작합니다.
+  firebaseProjectId: "english-fight-7c364",
+  firebaseApiKey: "",            // 선택 사항(비워도 됨)
+  room: "duel-f3316aab",       // 우리 가족 방 이름(남이 못 맞히게 아무 글자나 길게)
+  // 푸시 알림(ntfy 앱). 각자 폰에서 자기 토픽을 구독합니다. 비워두면 알림을 보내지 않습니다.
+  ntfyServer: "https://ntfy.sh",
+  ntfyTopics: { dad: "duel-f3316aab-dad", son: "duel-f3316aab-son" },
+  appUrl: "",                    // 알림을 눌렀을 때 열 주소(비우면 현재 주소)
+  players: {
+    dad: { name: "아빠", emoji: "🦁" },
+    son: { name: "아들", emoji: "🐯" }
+  },
+  resultHour: 22,                // 결과 발표 시각(한국 시간)
+  startDate: "2026-11-08",       // 단어 진도 1일차
+  newWordsPerDay: 8,
+  reviewWordsPerDay: 4,
+  defaultLevel: 3,               // 기본 난이도(1~5). 앱 설정에서 바꿀 수 있어요
+  studySeconds: 90,              // 외우기 시간
+  testTools: false               // true면 서버 모드에서도 '테스트 도구'가 보입니다
+};
+
+/* ===================== 단어장 (중1 수준) ===================== */
+const WORDS_RAW = `ability|능력|She has the ability to swim fast.
+absent|결석한|Tom was absent from school today.
+accept|받아들이다|Please accept my apology.
+accident|사고|He had a car accident yesterday.
+across|가로질러|We walked across the bridge.
+action|행동|Your action was very brave.
+activity|활동|Hiking is a fun outdoor activity.
+actually|사실은|I actually like rainy days.
+add|더하다|Add some sugar to the tea.
+address|주소|What is your email address?
+adult|어른|You need an adult to ride this.
+adventure|모험|The boys went on an adventure.
+advice|조언|Thanks for your good advice.
+afraid|두려워하는|I am afraid of big dogs.
+afternoon|오후|Let's play soccer this afternoon.
+again|다시|Please say that again.
+against|~에 맞서|We played against a strong team.
+agree|동의하다|I agree with your idea.
+air|공기|The air is fresh in the mountains.
+airport|공항|We arrived at the airport early.
+alone|혼자|He lives alone in a small house.
+already|이미|I have already finished my homework.
+always|항상|My dad always gets up early.
+amazing|놀라운|The magic show was amazing.
+angry|화난|Mom was angry at my messy room.
+animal|동물|The cat is my favorite animal.
+answer|대답|Do you know the answer?
+anything|무엇이든|Do you need anything else?
+apartment|아파트|We live in an apartment in Seoul.
+appear|나타나다|A rainbow will appear after the rain.
+arrive|도착하다|What time does the bus arrive?
+art|미술|Art is my favorite class.
+ask|묻다|Can I ask you a question?
+asleep|잠든|The baby is asleep now.
+attention|주의|Pay attention to the teacher.
+aunt|이모, 고모|My aunt lives in Busan.
+autumn|가을|Leaves turn red in autumn.
+avoid|피하다|Try to avoid junk food.
+awake|깨어 있는|I was awake all night.
+award|상|She won an award for her song.
+backpack|배낭|My backpack is very heavy.
+bake|굽다|Let's bake some cookies.
+balance|균형|Keep your balance on the bike.
+band|밴드|He plays the drums in a band.
+basket|바구니|Put the apples in the basket.
+bathroom|화장실|Where is the bathroom?
+battery|배터리|My phone battery is low.
+beach|해변|We swam at the beach.
+bear|곰|A bear sleeps all winter.
+beautiful|아름다운|What a beautiful flower!
+because|~때문에|I stayed home because it rained.
+become|~이 되다|I want to become a doctor.
+before|~전에|Wash your hands before dinner.
+begin|시작하다|The class will begin soon.
+behind|~뒤에|The cat is behind the sofa.
+believe|믿다|I believe you can do it.
+belong|속하다|These shoes belong to me.
+below|아래에|Write your name below the line.
+between|~사이에|Sit between Tom and Amy.
+bicycle|자전거|I ride my bicycle to school.
+bill|계산서|Can I have the bill, please?
+bird|새|A bird is singing in the tree.
+birthday|생일|Happy birthday to you!
+bite|물다|Does your dog bite?
+blanket|담요|I need a warm blanket.
+boil|끓이다|Boil the water for ten minutes.
+bone|뼈|The dog is eating a bone.
+borrow|빌리다|Can I borrow your pencil?
+both|둘 다|Both of my parents are teachers.
+bottle|병|He drank a bottle of water.
+bottom|맨 아래|The coin is at the bottom of the pool.
+brain|뇌|Your brain needs sleep.
+brave|용감한|The brave boy saved the cat.
+break|깨뜨리다|Don't break the window.
+breakfast|아침 식사|I eat bread for breakfast.
+breath|숨|Take a deep breath.
+bridge|다리(교량)|The bridge is very long.
+bright|밝은|The sun is very bright today.
+bring|가져오다|Bring your lunch tomorrow.
+brush|솔질하다|Brush your teeth after meals.
+build|짓다|They will build a new school.
+burn|태우다|Be careful not to burn the toast.
+busy|바쁜|My mom is busy today.
+buy|사다|I want to buy a new phone.
+calendar|달력|Check the date on the calendar.
+call|전화하다|I will call you tonight.
+calm|침착한|Stay calm and listen.
+camera|카메라|She took a photo with her camera.
+camp|캠프|We went to a summer camp.
+candle|양초|Blow out the candle.
+capital|수도|Seoul is the capital of Korea.
+careful|조심하는|Be careful on the stairs.
+carry|나르다|Can you carry this box?
+castle|성|The king lived in a castle.
+catch|잡다|Catch the ball!
+celebrate|축하하다|Let's celebrate your birthday.
+center|중심|The park is in the center of the city.
+century|세기(100년)|This house is a century old.
+chance|기회|Give me one more chance.
+change|바꾸다|I want to change my seat.
+cheap|값싼|This bag is very cheap.
+cheer|응원하다|We cheer for our team.
+chef|요리사|The chef cooked a great meal.
+choose|고르다|Choose one card.
+city|도시|Busan is a big city.
+classmate|반 친구|Minsu is my classmate.
+clean|깨끗한|Keep your room clean.
+clear|맑은|The sky is clear today.
+climb|오르다|Let's climb the mountain.
+close|닫다|Please close the door.
+cloud|구름|There is a white cloud in the sky.
+coin|동전|I found a coin on the street.
+collect|모으다|I collect baseball cards.
+color|색깔|What color do you like?
+comfortable|편안한|This chair is very comfortable.
+common|흔한|Kim is a common name in Korea.
+company|회사|My uncle works for a big company.
+compare|비교하다|Compare the two pictures.
+complete|완성하다|Complete the sentence.
+contest|대회|He won the singing contest.
+continue|계속하다|Let's continue the game.
+cook|요리하다|My dad likes to cook.
+copy|베끼다|Don't copy your friend's homework.
+corner|모퉁이|Turn left at the corner.
+count|세다|Count from one to ten.
+country|나라|Canada is a big country.
+cousin|사촌|My cousin is ten years old.
+cover|덮다|Cover the pot with a lid.
+create|창조하다|Let's create a new game.
+cross|건너다|Look both ways before you cross the street.
+crowd|군중|A big crowd watched the game.
+cry|울다|The baby began to cry.
+culture|문화|I love Korean culture.
+curious|호기심 많은|Cats are curious animals.
+customer|손님|The customer wants a refund.
+cut|자르다|Cut the paper in half.
+cute|귀여운|What a cute puppy!
+daily|매일의|Exercise is part of my daily life.
+danger|위험|The sign says danger.
+dark|어두운|It gets dark early in winter.
+date|날짜|What is the date today?
+decide|결정하다|I can't decide what to eat.
+deep|깊은|The lake is very deep.
+delicious|맛있는|This pizza is delicious.
+dentist|치과 의사|I visit the dentist twice a year.
+desert|사막|It is hot in the desert.
+design|디자인하다|She will design a new dress.
+diary|일기|I write in my diary every night.
+dictionary|사전|Look it up in the dictionary.
+different|다른|We have different ideas.
+difficult|어려운|This math problem is difficult.
+dinner|저녁 식사|What's for dinner?
+dirty|더러운|My shoes are dirty.
+discover|발견하다|They will discover a new island.
+divide|나누다|Divide the pizza into four pieces.
+doll|인형|My sister has a cute doll.
+dream|꿈|My dream is to be a pilot.
+dress|드레스|She wore a red dress.
+drop|떨어뜨리다|Don't drop the glass.
+dry|마른|My hair is dry now.
+during|~동안|I slept during the movie.
+early|일찍|I got up early this morning.
+earth|지구|The earth goes around the sun.
+easily|쉽게|He solved the problem easily.
+east|동쪽|The sun rises in the east.
+empty|비어 있는|The box is empty.
+enemy|적|The enemy attacked the castle.
+energy|에너지|Kids have a lot of energy.
+enjoy|즐기다|Enjoy your meal!
+enough|충분한|We have enough time.
+enter|들어가다|Knock before you enter the room.
+environment|환경|We must protect the environment.
+eraser|지우개|Can I use your eraser?
+error|오류|There is an error in this sentence.
+event|행사|The school event starts at ten.
+everyone|모든 사람|Everyone likes ice cream.
+exam|시험|I have a math exam tomorrow.
+example|예|Give me an example.
+excellent|훌륭한|Your English is excellent.
+exciting|신나는|The game was very exciting.
+exercise|운동하다|I exercise every morning.
+expensive|비싼|This watch is too expensive.
+experience|경험|It was a great experience.
+explain|설명하다|Can you explain this word?
+face|얼굴|Wash your face.
+fact|사실|That is an interesting fact.
+fail|실패하다|Don't be afraid to fail.
+fair|공정한|That's not fair!
+fall|넘어지다|Be careful not to fall.
+famous|유명한|He is a famous singer.
+far|먼|My school is not far from here.
+farm|농장|There are cows on the farm.
+fast|빠른|The cheetah is a fast animal.
+favorite|가장 좋아하는|What is your favorite food?
+fear|두려움|He has a fear of heights.
+feel|느끼다|I feel happy today.
+festival|축제|We went to a music festival.
+fever|열|I have a high fever.
+field|들판|The kids are running in the field.
+fight|싸우다|Don't fight with your brother.
+fill|채우다|Fill the glass with milk.
+final|최종의|This is the final game.
+find|찾다|I can't find my keys.
+finger|손가락|I cut my finger.
+finish|끝내다|Finish your homework first.
+fix|고치다|Can you fix my bike?
+flag|깃발|The flag is red and white.
+float|뜨다|Wood can float on water.
+floor|층|My room is on the second floor.
+flower|꽃|She gave me a flower.
+fly|날다|Birds can fly.
+focus|집중하다|Focus on your work.
+fog|안개|The fog was very thick.
+follow|따라가다|Follow me, please.
+foreign|외국의|Can you speak a foreign language?
+forest|숲|Many animals live in the forest.
+forget|잊다|Don't forget your umbrella.
+forgive|용서하다|Please forgive me.
+free|무료의|The museum is free on Sundays.
+fresh|신선한|These vegetables are fresh.
+friendly|친근한|The new teacher is friendly.
+front|앞|Sit in the front row.
+fruit|과일|Apples are my favorite fruit.
+full|배부른|I'm full. I can't eat more.
+fun|재미|We had fun at the party.
+future|미래|What will you do in the future?
+garden|정원|Grandma grows tomatoes in her garden.
+gate|문(출입구)|Meet me at the school gate.
+gather|모이다|People gather in the square.
+gentle|부드러운|Be gentle with the baby.
+gift|선물|Thank you for the gift.
+glad|기쁜|I'm glad to see you.
+glass|유리잔|Can I have a glass of water?
+goal|목표|My goal is to read ten books.
+gold|금|She won a gold medal.
+grade|학년|I'm in the seventh grade.
+grass|잔디|Don't walk on the grass.
+great|굉장한|You did a great job!
+ground|땅|The ball fell to the ground.
+group|그룹|Let's work in a group.
+grow|자라다|Plants grow fast in summer.
+guess|추측하다|Guess what I have.
+guide|안내원|Our guide showed us the city.
+habit|습관|Reading is a good habit.
+hair|머리카락|She has long hair.
+half|절반|I ate half of the cake.
+hall|강당|We met in the school hall.
+handsome|잘생긴|Your dad is handsome.
+hang|걸다|Hang your coat here.
+happen|일어나다|What will happen next?
+hard|열심히|I studied hard for the test.
+hate|싫어하다|I hate cold weather.
+health|건강|Sleep is good for your health.
+hear|듣다|Can you hear me?
+heart|심장|My heart is beating fast.
+heavy|무거운|This bag is heavy.
+helpful|도움이 되는|Thanks, that was helpful.
+hero|영웅|He is my hero.
+hide|숨다|Let's hide behind the tree.
+hill|언덕|Our house is on a hill.
+history|역사|I like Korean history.
+hobby|취미|My hobby is drawing.
+hold|붙잡고 있다|Hold my hand.
+hole|구멍|There is a hole in my sock.
+holiday|휴일|Chuseok is a big holiday.
+honest|정직한|Be honest with me.
+hope|바라다|I hope you feel better.
+hospital|병원|My grandpa is in the hospital.
+huge|거대한|An elephant is a huge animal.
+human|인간|Every human needs water.
+hungry|배고픈|I'm so hungry.
+hurry|서두르다|Hurry up! We're late.
+hurt|다치게 하다|Did you hurt your leg?
+idea|생각, 아이디어|That's a good idea!
+important|중요한|Health is very important.
+improve|향상시키다|I want to improve my English.
+include|포함하다|Does the price include lunch?
+information|정보|I need more information.
+insect|곤충|An ant is a small insect.
+inside|안에서|Let's play inside today.
+interesting|흥미로운|This book is interesting.
+invent|발명하다|I want to invent a flying car.
+invite|초대하다|I will invite my friends to my party.
+island|섬|Jeju is a beautiful island.
+job|직업|My dad's job is very busy.
+join|가입하다|Do you want to join our club?
+journey|여정|It was a long journey.
+joy|기쁨|She jumped with joy.
+judge|심사위원|The judge gave him a high score.
+jump|뛰어오르다|Can you jump high?
+keep|유지하다|Keep the door open.
+key|열쇠|I lost my key.
+kick|차다|Kick the ball hard.
+kind|친절한|She is kind to everyone.
+kitchen|부엌|Mom is in the kitchen.
+knee|무릎|I hurt my knee.
+knife|칼|Be careful with the knife.
+knock|두드리다|Knock on the door.
+language|언어|Korean is my first language.
+large|큰|We need a large box.
+last|마지막의|This is my last chance.
+late|늦은|Don't be late for school.
+laugh|웃다|The joke made us laugh.
+lazy|게으른|Don't be lazy.
+lead|이끌다|She will lead the team.
+leaf|나뭇잎|A leaf fell from the tree.
+learn|배우다|I want to learn Chinese.
+leave|떠나다|We leave at nine.
+lesson|수업|The piano lesson starts at four.
+letter|편지|I wrote a letter to my grandma.
+library|도서관|I borrowed a book from the library.
+lie|거짓말하다|Don't lie to me.
+life|삶|Life is beautiful.
+light|빛|Turn on the light.
+line|줄|Stand in line, please.
+listen|귀 기울여 듣다|Listen to the music.
+local|지역의|We shop at a local market.
+lock|잠그다|Lock the door at night.
+lose|잃어버리다|Don't lose your ticket.
+loud|시끄러운|The music is too loud.
+lucky|운이 좋은|Seven is my lucky number.
+magic|마술|He showed us a magic trick.
+main|주요한|What's the main idea?
+map|지도|Look at the map.
+market|시장|We bought fish at the market.
+math|수학|Math is my best subject.
+meal|식사|Breakfast is an important meal.
+mean|의미하다|What does this word mean?
+medicine|약|Take this medicine after meals.
+meet|만나다|Nice to meet you.
+memory|기억력|I have a good memory.
+message|메시지|I sent you a message.
+middle|중간|Stand in the middle.
+minute|분|Wait a minute.
+mirror|거울|Look in the mirror.
+miss|그리워하다|I miss my old friends.
+mistake|실수|Everyone makes a mistake.
+moment|잠깐, 순간|Wait a moment, please.
+money|돈|I saved money for a new bike.
+monster|괴물|There is a monster under my bed!
+moon|달|The moon is bright tonight.
+mountain|산|We climbed a high mountain.
+move|이사하다|We will move to a new house.
+museum|박물관|We visited the science museum.
+music|음악|I listen to music every day.
+nature|자연|I love walking in nature.
+near|가까운|Is there a bank near here?
+necessary|필요한|Water is necessary for life.
+neighbor|이웃|Our neighbor has a big dog.
+nervous|긴장한|I was nervous before the test.
+never|결코 ~않다|I will never give up.
+newspaper|신문|My dad reads the newspaper.
+noise|소음|Don't make any noise.
+north|북쪽|Birds fly north in spring.
+note|메모|I left a note on the table.
+nothing|아무것도 ~않다|There is nothing in the box.
+novel|소설|She is reading a novel.
+nurse|간호사|The nurse is very kind.
+ocean|대양|Whales live in the ocean.
+offer|제공하다|They offer free drinks.
+office|사무실|My mom works in an office.
+often|자주|I often play games with my dad.
+once|한 번|I go swimming once a week.
+open|열다|Open your books.
+order|주문하다|Can I order a pizza?
+outside|밖에서|Let's play outside.
+pain|통증|I have a pain in my back.
+paint|칠하다|Let's paint the wall blue.
+pair|한 켤레, 한 쌍|I need a new pair of shoes.
+palace|궁전|Gyeongbokgung is a famous palace.
+parent|부모|Every parent loves their child.
+part|부분|This is the best part of the movie.
+pass|합격하다|I hope I pass the test.
+passport|여권|Don't forget your passport.
+past|과거|Let's forget the past.
+peace|평화|We want peace in the world.
+people|사람들|Many people came to the concert.
+perfect|완벽한|Your answer is perfect.
+person|사람|He is a nice person.
+pet|애완동물|Do you have a pet?
+photo|사진|Let's take a photo together.
+piece|조각|Can I have a piece of cake?
+place|장소|This is my favorite place.
+plan|계획|What is your plan for the weekend?
+planet|행성|Mars is a red planet.
+plant|식물|Water the plant every day.
+plate|접시|Put the cake on the plate.
+pocket|주머니|I have a coin in my pocket.
+poem|시(문학)|She wrote a poem about spring.
+point|점수|Our team got one more point.
+police|경찰|Call the police!
+polite|예의 바른|Be polite to older people.
+pool|수영장|Let's swim in the pool.
+popular|인기 있는|This song is very popular.
+possible|가능한|Is it possible to finish today?
+practice|연습하다|I practice the piano every day.
+prepare|준비하다|Mom will prepare dinner.
+present|현재|Live in the present.
+pretty|예쁜|What a pretty dress!
+price|가격|What is the price of this shirt?
+prize|상품|He won first prize.
+problem|문제|No problem!
+promise|약속하다|I promise I will be there.
+protect|보호하다|Helmets protect your head.
+proud|자랑스러운|I'm proud of you.
+pull|당기다|Pull the door to open it.
+push|밀다|Don't push me!
+puzzle|퍼즐|I like doing a jigsaw puzzle.
+quick|재빠른|Take a quick look.
+quiet|조용한|Please be quiet in the library.
+race|경주|He won the race.
+rain|비|I like the sound of rain.
+reach|~에 이르다|We will reach the top soon.
+ready|준비된|Are you ready?
+real|진짜의|Is this a real diamond?
+reason|이유|Tell me the reason.
+receive|받다|Did you receive my letter?
+remember|기억하다|I remember your name.
+repeat|반복하다|Repeat after me.
+rest|휴식|Take a rest.
+restaurant|식당|Let's eat at that restaurant.
+return|반납하다|Please return the book by Friday.
+rich|부유한|He became rich.
+ride|타다|Can you ride a horse?
+river|강|The river is very long.
+road|도로|The road is wet.
+robot|로봇|This robot can dance.
+rock|바위|He sat on a big rock.
+roof|지붕|There is a cat on the roof.
+rule|규칙|That is the rule.
+run|달리다|I run in the park every morning.
+sad|슬픈|The movie was sad.
+safe|안전한|Is this place safe?
+salt|소금|Add a little salt.
+same|같은|We are in the same class.
+save|구하다|She will save the child.
+scared|겁먹은|I'm scared of the dark.
+schedule|일정|What's your schedule today?
+science|과학|Science is fun.
+score|득점|What was the final score?
+season|계절|Spring is my favorite season.
+secret|비밀|Can you keep a secret?
+send|보내다|Send me a photo.
+serious|심각한|This is a serious problem.
+shape|모양|A ball has a round shape.
+share|공유하다|Let's share the pizza.
+sharp|날카로운|The knife is very sharp.
+shine|빛나다|The stars shine at night.
+shop|가게|There is a flower shop near my house.
+short|짧은|She has short hair.
+shout|소리치다|Don't shout in the classroom.
+show|보여주다|Show me your picture.
+shy|수줍은|He is shy around new people.
+sick|아픈|I was sick yesterday.
+sign|표지판|Read the sign carefully.
+silent|고요한|The room was silent.
+simple|간단한|The rule is simple.
+skill|솜씨|Cooking is a useful skill.
+sky|하늘|The sky is blue.
+sleepy|졸린|I feel sleepy after lunch.
+slow|느린|The turtle is slow.
+smart|똑똑한|My dog is very smart.
+smell|냄새 맡다|I can smell bread.
+smile|미소 짓다|Smile for the camera!
+snack|간식|I want a snack.
+snow|눈(날씨)|The kids played in the snow.
+soft|푹신한|This pillow is soft.
+soldier|군인|My uncle is a soldier.
+solve|풀다|Can you solve this puzzle?
+someday|언젠가|I will visit Paris someday.
+sometimes|때때로|I sometimes eat ramen at night.
+sound|소리|What's that sound?
+south|남쪽|Busan is in the south of Korea.
+space|우주|I want to travel to space.
+special|특별한|Today is a special day.
+speech|연설|He gave a speech at school.
+spend|소비하다(시간·돈)|How do you spend your free time?
+spicy|매운|Kimchi is spicy.
+sport|스포츠|What sport do you like?
+spring|봄|Flowers bloom in spring.
+stage|무대|The singer is on the stage.
+star|별|Look at that bright star.
+start|시작되다|The game will start at seven.
+stay|머무르다|Stay here, please.
+step|걸음|Take one step forward.
+stomach|배(신체)|My stomach hurts.
+storm|폭풍|A big storm is coming.
+story|이야기|Tell me a funny story.
+strange|이상한|I heard a strange noise.
+stranger|낯선 사람|Don't talk to a stranger.
+street|거리|Be careful on the street.
+strong|강한|He is very strong.
+student|학생|I am a middle school student.
+study|공부하다|I study English every day.
+subject|과목|What is your favorite subject?
+subway|지하철|I take the subway to school.
+success|성공|Practice is the key to success.
+sugar|설탕|Don't put too much sugar in it.
+summer|여름|It is very hot in summer.
+sunny|화창한|It's sunny today.
+sure|확실한|Are you sure?
+surprise|놀라게 하다|We have a surprise for you.
+sweet|달콤한|This candy is sweet.
+swim|수영하다|Can you swim?
+table|탁자|The book is on the table.
+tail|꼬리|The dog is wagging its tail.
+talent|재능|She has a talent for music.
+taste|맛|I like the taste of lemon.
+teach|가르치다|Can you teach me English?
+team|팀|Our team won the game.
+tear|눈물|A tear ran down her face.
+temperature|온도|What's the temperature today?
+test|테스트|We have a test on Friday.
+thick|두꺼운|This book is thick.
+thin|얇은|The ice is too thin.
+thirsty|목마른|I'm thirsty. Can I have some water?
+throw|던지다|Throw the ball to me.
+ticket|표|I lost my ticket.
+tidy|깔끔한|Keep your desk tidy.
+tired|피곤한|I'm tired after school.
+together|함께|Let's go together.
+tomorrow|내일|See you tomorrow.
+tonight|오늘 밤|What's on TV tonight?
+tooth|이(치아)|I have a bad tooth.
+top|꼭대기|We reached the top of the hill.
+touch|만지다|Don't touch the painting.
+tour|관광|We took a tour of the city.
+town|소도시|I live in a small town.
+toy|장난감|My little brother loves this toy.
+traffic|교통량|There is a lot of traffic today.
+travel|여행하다|I want to travel around the world.
+treasure|보물|The pirates found the treasure.
+tree|나무|There is a bird in the tree.
+trip|여행|We went on a school trip.
+trouble|곤경|I'm in trouble!
+true|사실인|Is it true?
+trust|신뢰하다|You can trust me.
+try|해 보다|Try this cake.
+turn|차례|It's your turn.
+twice|두 번|I brush my teeth twice a day.
+umbrella|우산|Take an umbrella with you.
+uncle|삼촌|My uncle is a pilot.
+understand|이해하다|I don't understand this question.
+uniform|교복|We wear a school uniform.
+universe|우주 전체|The universe is very big.
+until|~까지|Wait until I come back.
+upset|속상한|She was upset about the test.
+useful|유용한|This app is very useful.
+usually|보통|I usually get up at seven.
+vacation|방학|Summer vacation starts next week.
+vegetable|채소|A carrot is a healthy vegetable.
+village|마을|My grandpa lives in a small village.
+visit|방문하다|Let's visit grandma this weekend.
+voice|목소리|She has a beautiful voice.
+volunteer|자원봉사자|He works as a volunteer at the hospital.
+wait|기다리다|Please wait here.
+wake|(잠에서) 깨다|Wake up! It's eight o'clock.
+wall|벽|There is a clock on the wall.
+wallet|지갑|I lost my wallet.
+war|전쟁|Nobody wants war.
+warm|따뜻한|It's warm today.
+wash|씻다|Wash your hands.
+waste|낭비하다|Don't waste water.
+watch|보다(시청)|Let's watch a movie.
+weather|날씨|How is the weather today?
+weekend|주말|What did you do on the weekend?
+weight|무게|What is your weight?
+welcome|환영하다|Welcome to our school!
+west|서쪽|The sun sets in the west.
+wet|젖은|My shoes are wet.
+wheel|바퀴|The car has a flat wheel.
+while|~하는 동안|Don't talk while you eat.
+whole|전체의|I ate the whole pizza.
+wide|넓은|The river is wide.
+wild|야생의|Lions are wild animals.
+win|이기다|I want to win the game.
+wind|바람|The wind is very strong.
+window|창문|Open the window, please.
+wing|날개|The bird hurt its wing.
+winner|승자|And the winner is... Dad!
+winter|겨울|It snows a lot in winter.
+wise|현명한|My grandma is wise.
+wish|소원|Make a wish!
+without|~없이|I can't live without music.
+wonderful|멋진|What a wonderful day!
+wood|목재|This table is made of wood.
+word|단어|Learn one new word every day.
+world|세계|There are many countries in the world.
+worry|걱정하다|Don't worry. Be happy.
+write|쓰다|Write your name here.
+wrong|틀린|Your answer is wrong.
+yesterday|어제|I met him yesterday.
+young|어린|My mom looks young.
+zoo|동물원|We saw a tiger at the zoo.`;
+/* 중2~3 수준 단어 (난이도 3 이상에서 섞여 나옴) */
+const WORDS_ADV_RAW = `achieve|성취하다|She worked hard to achieve her goal.
+admire|존경하다|I admire my grandfather.
+allow|허락하다|My parents allow me to play games on weekends.
+amount|양|Drink a large amount of water.
+ancient|고대의|We visited an ancient temple.
+announce|발표하다|The teacher will announce the winner.
+annoying|짜증나는|That noise is really annoying.
+anxious|불안한|He felt anxious before the interview.
+apologize|사과하다|You should apologize to your sister.
+appreciate|감사하다|I appreciate your help.
+approach|다가가다|The cat began to approach the bird.
+argue|말다툼하다|My brothers often argue about games.
+arrange|배열하다|Arrange the books by size.
+attach|붙이다|Attach a photo to the email.
+attempt|시도|He passed the test on his first attempt.
+attract|끌어들이다|Flowers attract bees.
+audience|관객|The audience clapped loudly.
+available|이용 가능한|Is this seat available?
+average|평균|The average score was 80.
+aware|알고 있는|Are you aware of the danger?
+behavior|품행|His behavior in class was good.
+benefit|이익|What is the benefit of this plan?
+blame|탓하다|Don't blame others for your mistake.
+boring|지루한|The movie was boring.
+breathe|숨 쉬다|Breathe in slowly.
+brief|간결한|Keep your speech brief.
+burden|부담|I don't want to be a burden.
+capable|~할 능력이 있는|She is capable of solving it.
+career|경력|He started his career as a teacher.
+cause|원인|What is the cause of the fire?
+challenge|도전|This game is a real challenge.
+character|등장인물|Who is the main character?
+charge|요금|There is no charge for kids.
+citizen|시민|Every citizen has the right to vote.
+climate|기후|The climate is getting warmer.
+communicate|의사소통하다|We communicate by email.
+community|지역 사회|Our community has a new park.
+compete|경쟁하다|Ten teams will compete in the final.
+complain|불평하다|Don't complain about the food.
+condition|상태|The car is in good condition.
+confident|자신감 있는|Be confident in yourself.
+confuse|혼란스럽게 하다|These two words confuse me.
+connect|연결하다|Connect the cable to the TV.
+consider|고려하다|Please consider my idea.
+contain|담고 있다|Does this food contain sugar?
+convenient|편리한|Online shopping is convenient.
+conversation|대화|We had a long conversation.
+courage|용기|It takes courage to say sorry.
+crash|충돌하다|The two cars may crash.
+creative|창의적인|She has creative ideas.
+crime|범죄|Stealing is a crime.
+damage|피해|The storm caused great damage.
+deal|거래|It's a good deal.
+debate|토론|We had a debate about school uniforms.
+decrease|감소하다|The number of students will decrease.
+defend|방어하다|Soldiers defend the country.
+deliver|배달하다|They deliver pizza fast.
+depend|의존하다|Children depend on their parents.
+describe|묘사하다|Describe your best friend.
+destroy|파괴하다|The fire may destroy the forest.
+detail|세부 사항|Tell me every detail.
+develop|발전시키다|I want to develop my skills.
+device|기기|A phone is a useful device.
+disappear|사라지다|The sun will disappear behind the clouds.
+disappointed|실망한|I was disappointed with the result.
+disease|질병|Wash your hands to prevent disease.
+donate|기부하다|Let's donate old clothes.
+effort|노력|Thank you for your effort.
+elect|선출하다|We will elect a class president.
+emergency|비상 사태|Call 119 in an emergency.
+emotion|감정|Anger is a strong emotion.
+encourage|격려하다|Teachers encourage students to read.
+equal|동등한|All people are equal.
+escape|탈출하다|The bird tried to escape from the cage.
+especially|특히|I like fruit, especially apples.
+eventually|결국|He eventually won the game.
+evidence|증거|The police found new evidence.
+exact|정확한|What is the exact time?
+exchange|교환하다|Can I exchange this shirt?
+exist|존재하다|Do ghosts really exist?
+expect|기대하다|I expect a good result.
+express|표현하다|Express your feelings in words.
+extra|추가의|Bring an extra pencil.
+fashion|패션|She loves fashion.
+fault|잘못|It's not your fault.
+flexible|유연한|Dancers are very flexible.
+force|힘|The force of the wind broke the tree.
+former|이전의|He is a former soccer player.
+fortune|큰 재산|He made a fortune.
+frequent|잦은|He is a frequent visitor here.
+frighten|겁먹게 하다|Loud noises frighten my dog.
+function|기능|What is the function of this button?
+generous|너그러운|My uncle is very generous.
+global|세계적인|Climate change is a global problem.
+government|정부|The government made a new law.
+grab|움켜잡다|Grab my hand!
+graduate|졸업하다|I will graduate next year.
+guilty|죄책감을 느끼는|I feel guilty about lying.
+harm|해|Too much sugar can do harm.
+harvest|수확|Farmers are busy during the harvest.
+heal|치유하다|Time will heal the pain.
+hesitate|망설이다|Don't hesitate to ask.
+honor|명예|It is an honor to meet you.
+ignore|무시하다|Don't ignore my message.
+imagine|상상하다|Imagine you can fly.
+impossible|불가능한|Nothing is impossible.
+impress|감동시키다|Her speech will impress everyone.
+increase|증가하다|Prices increase every year.
+independent|독립적인|She wants to be independent.
+influence|영향|Parents have a big influence on children.
+injury|부상|He had a knee injury.
+instead|대신에|Let's walk instead.
+knowledge|지식|Reading gives you knowledge.
+lack|부족|Lack of sleep is bad for you.
+law|법|Everyone must follow the law.
+limit|제한|There is a time limit.
+liquid|액체|Water is a liquid.
+loss|손실|The loss of the game made us sad.
+manage|관리하다|She can manage her time well.
+material|재료|Wood is a building material.
+measure|측정하다|Measure the length of the table.
+mention|언급하다|Don't mention it.
+method|방법|This is a new method to learn English.
+mild|온화한|The weather is mild today.
+modern|현대의|I like modern art.
+narrow|좁은|The road is narrow.
+native|모국의|English is her native language.
+negative|부정적인|Don't be so negative.
+object|물체|What is that object?
+observe|관찰하다|We observe stars at night.
+obvious|명백한|The answer is obvious.
+occur|발생하다|When did the accident occur?
+opinion|의견|What is your opinion?
+ordinary|평범한|It was an ordinary day.
+organize|조직하다|Let's organize a party.
+origin|기원|What is the origin of this word?
+patient|참을성 있는|Be patient with your sister.
+perform|공연하다|The band will perform tonight.
+persuade|설득하다|I tried to persuade my mom.
+physical|신체의|Physical activity is good for you.
+pollution|오염|Air pollution is a big problem.
+population|인구|What is the population of Seoul?
+positive|긍정적인|Think positive.
+precious|소중한|Time is precious.
+predict|예측하다|Nobody can predict the future.
+prefer|선호하다|I prefer tea to coffee.
+pressure|압박|I feel a lot of pressure.
+prevent|예방하다|Wash your hands to prevent colds.
+pride|자부심|He takes pride in his work.
+private|사적인|This is a private room.
+produce|생산하다|This factory will produce cars.
+progress|진전|You made great progress.
+proper|적절한|Wear proper shoes for hiking.
+provide|공급하다|Cows provide milk.
+public|공공의|This is a public library.
+purpose|목적|What is the purpose of your visit?
+quality|품질|This bag is high quality.
+raise|들어 올리다|Raise your hand.
+range|범위|This store has a wide range of toys.
+rapid|급속한|The city saw rapid growth.
+rare|드문|This is a rare bird.
+react|반응하다|How did he react to the news?
+recent|최근의|This is a recent photo.
+recognize|알아보다|I didn't recognize you!
+recommend|추천하다|Can you recommend a good book?
+recover|회복하다|He will recover soon.
+reduce|줄이다|We should reduce trash.
+refuse|거절하다|Don't refuse his invitation.
+regret|후회하다|I regret saying that.
+relax|긴장을 풀다|Relax and enjoy the music.
+release|풀어 주다|They will release the fish into the river.
+remain|남아 있다|Please remain seated.
+remove|제거하다|Remove your shoes, please.
+replace|교체하다|Replace the old battery.
+require|필요로 하다|Plants require sunlight.
+rescue|구조하다|Firefighters rescue people.
+research|연구|He does research on robots.
+respect|존중하다|Respect your elders.
+responsible|책임 있는|You are responsible for your pet.
+result|결과|What was the result?
+reveal|드러내다|He will reveal the secret.
+reward|보상|You will get a reward.
+role|역할|What is your role in the play?
+rough|거친|The sea is rough today.
+route|경로|This is the fastest route.
+rude|무례한|Don't be rude.
+satisfy|만족시키다|It is hard to satisfy him.
+scene|장면|This is my favorite scene.
+search|검색하다|Search the word online.
+select|선택하다|Select one answer.
+sense|감각|Dogs have a good sense of smell.
+separate|분리하다|Separate the trash.
+shelter|피난처|The cat found shelter from the rain.
+signal|신호|Wait for the green signal.
+similar|비슷한|Our bags are similar.
+situation|상황|This is a difficult situation.
+society|사회|We live in a modern society.
+solution|해결책|We need a solution.
+source|원천|The sun is a source of energy.
+species|종(생물)|This species lives in Africa.
+spread|퍼지다|The news will spread fast.
+steal|훔치다|Don't steal.
+strength|강점|What is your strength?
+stress|스트레스|Exercise reduces stress.
+structure|구조|Look at the structure of the bridge.
+suffer|고통받다|Many animals suffer in hot weather.
+suggest|제안하다|I suggest we leave now.
+support|지지하다|My family will support me.
+surface|표면|The surface of the moon is rough.
+surround|둘러싸다|Trees surround the house.
+survive|살아남다|Plants can't survive without water.
+symbol|상징|The dove is a symbol of peace.
+target|과녁|He hit the target.
+technology|기술|New technology changes our lives.
+temporary|일시적인|This is a temporary job.
+theory|이론|Do you know Einstein's theory?
+threat|위협|Pollution is a threat to nature.
+tradition|전통|Chuseok is a Korean tradition.
+trend|유행|This is the new trend.
+typical|전형적인|It was a typical school day.
+unique|독특한|Everyone is unique.
+urgent|긴급한|This is an urgent message.
+valuable|귀중한|This ring is valuable.
+various|다양한|We sell various fruits.
+victim|피해자|He helped the victim.
+view|경치|The view from the top is great.
+visible|눈에 보이는|The stars are visible tonight.
+vote|투표하다|We vote for class president.
+wander|돌아다니다|We like to wander around the city.
+wealth|부(재산)|Health is better than wealth.
+wisdom|지혜|Grandma is full of wisdom.
+witness|목격자|The witness saw the accident.
+worth|~할 가치가 있는|This book is worth reading.
+youth|젊음|Enjoy your youth.
+abroad|해외로|I want to study abroad.
+absorb|흡수하다|Plants absorb water.
+adapt|적응하다|Animals adapt to their environment.
+advantage|장점|What is the advantage of this phone?
+affect|영향을 미치다|Sleep can affect your mood.
+alarm|경보|The fire alarm went off.
+alive|살아 있는|The fish is still alive.
+anniversary|기념일|Today is my parents' wedding anniversary.
+apply|지원하다|I will apply for the job.
+artificial|인공의|This is artificial grass.
+astronaut|우주 비행사|I want to be an astronaut.
+atmosphere|분위기|The atmosphere was friendly.
+author|작가|Who is the author of this book?
+background|배경|Look at the background of the picture.
+basic|기본적인|Learn the basic rules.
+billion|10억|There are about eight billion people.
+biology|생물학|Biology is the study of life.
+border|국경|We crossed the border.
+branch|나뭇가지|A bird sat on the branch.
+budget|예산|We have a small budget.
+bully|괴롭히다|Don't bully others.
+campaign|캠페인|They started a campaign to save water.
+cancel|취소하다|We had to cancel the trip.
+cell|세포|A cell is very small.
+ceremony|의식|The wedding ceremony was beautiful.
+chemical|화학의|Don't touch the chemical bottle.
+chore|집안일|Doing the dishes is my chore.
+coach|코치|Our coach is very strict.
+coast|해안|We drove along the coast.
+comment|댓글|Leave a comment below.
+concert|콘서트|We went to a concert last night.
+contact|연락하다|Please contact me later.
+cooperate|협력하다|We must cooperate to win.
+costume|의상|She wore a pirate costume.
+crop|농작물|Rice is the main crop in Korea.
+custom|관습|Bowing is a Korean custom.
+data|자료|We collected data for the project.
+decorate|장식하다|Let's decorate the tree.
+definitely|분명히|I will definitely come.
+delay|지연|Sorry for the delay.
+demand|요구하다|They demand higher pay.
+destination|목적지|We finally reached our destination.
+dinosaur|공룡|The dinosaur was huge.
+direction|방향|Which direction is north?
+disaster|재난|The flood was a disaster.
+display|전시하다|They display art in the hall.
+document|문서|Save the document.
+domestic|국내의|This is a domestic flight.
+due|~하기로 되어 있는|The homework is due tomorrow.
+earn|벌다|I want to earn money.
+economy|경제|The economy is growing.
+educate|교육하다|Schools educate children.
+electricity|전기|Turn off the lights to save electricity.
+engine|엔진|The car engine is loud.
+essay|에세이|Write an essay about your dream.
+excuse|변명|That's a poor excuse.
+exhibition|전시회|We went to an art exhibition.
+experiment|실험|We did a science experiment.
+expert|전문가|He is a computer expert.
+fantastic|환상적인|The show was fantastic.
+feature|특징|What is the main feature of this phone?
+fiction|허구|This story is fiction.
+fit|꼭 맞다|These shoes fit well.
+flood|홍수|The flood destroyed many houses.
+gain|얻다|You will gain experience.
+gesture|몸짓|He made a friendly gesture.
+goods|물품|They sell goods online.
+habitat|서식지|The forest is a habitat for animals.
+hire|고용하다|We will hire a new teacher.
+image|이미지|The image is clear.
+immediately|즉시|Call me immediately.
+industry|산업|The car industry is big in Korea.
+insist|주장하다|I insist on paying.
+inspire|영감을 주다|Her story will inspire you.
+instruction|지시|Read each instruction carefully.
+instrument|악기|Do you play an instrument?
+intelligent|지적인|Dolphins are intelligent animals.
+interview|면접|I have a job interview.
+investigate|조사하다|The police will investigate the case.
+issue|쟁점|This is an important issue.
+item|항목|Check each item on the list.
+journalist|기자|The journalist wrote a story about it.
+lecture|강의|The lecture was long.
+leisure|여가|What do you do in your leisure time?
+license|면허|He got a driver's license.
+literature|문학|I like Korean literature.
+luggage|짐|Don't forget your luggage.
+mature|성숙한|She is mature for her age.
+medal|메달|He won a medal.
+midnight|자정|He came home at midnight.
+mission|임무|Your mission is to find the key.
+motivate|동기를 부여하다|Good teachers motivate students.
+mystery|수수께끼|It is still a mystery.
+nation|국가|Korea is a strong nation.
+nearby|근처의|Is there a hospital nearby?
+nutrition|영양|Good nutrition is important.
+occasion|때(특별한 일)|Wear a suit for a special occasion.
+official|공식적인|English is an official language here.
+operate|작동시키다|How do you operate this machine?
+option|선택지|We have no other option.
+overcome|극복하다|You can overcome your fear.
+pace|속도|Walk at your own pace.
+participate|참여하다|Everyone can participate in the event.
+passenger|승객|Every passenger must wear a seat belt.
+perhaps|아마도|Perhaps it will rain tomorrow.
+period|기간|We stayed there for a short period.
+permanent|영구적인|This is a permanent marker.
+personality|성격|She has a cheerful personality.
+plenty|많음|We have plenty of time.
+portrait|초상화|He painted a portrait of his mother.
+poverty|가난|Many people still live in poverty.
+practical|실용적인|This is a practical gift.
+praise|칭찬하다|The teacher will praise you.
+principal|교장|The principal gave a speech.
+priority|우선 사항|Safety is our first priority.
+profit|수익|The shop made a profit.
+pronounce|발음하다|How do you pronounce this word?
+prove|증명하다|Can you prove it?
+publish|출판하다|They will publish her book.
+punish|벌주다|Don't punish the dog.
+realize|깨닫다|I didn't realize it was late.
+recipe|조리법|This is my mom's recipe.
+recycle|재활용하다|We recycle paper and cans.
+reflect|반사하다|Mirrors reflect light.
+region|지방|This region is famous for apples.
+relationship|관계|We have a good relationship.
+rent|세내다|We rent a house near the beach.
+represent|대표하다|She will represent our school.
+reputation|평판|The restaurant has a good reputation.
+request|요청|I have a request.
+resource|자원|Water is a precious resource.
+response|응답|I got no response.
+retire|은퇴하다|My grandpa will retire next year.
+review|복습하다|Review your notes before the test.
+rhythm|리듬|Clap to the rhythm.
+rival|경쟁자|He is my biggest rival.
+rumor|소문|Don't believe the rumor.
+sacrifice|희생|Parents make a sacrifice for their kids.
+sail|항해하다|We will sail to Jeju.
+scholarship|장학금|She won a scholarship.
+scientist|과학자|I want to be a scientist.
+scream|비명을 지르다|I heard someone scream.
+section|구역|This section is for kids.
+sensitive|민감한|My skin is sensitive.
+series|시리즈|I love this book series.
+shadow|그림자|My shadow is long in the evening.
+silence|침묵|There was a long silence.
+slide|미끄러지다|Kids slide down the hill.
+specific|구체적인|Give me a specific example.
+spirit|정신|Team spirit is important.
+statue|조각상|There is a statue in the park.
+steady|꾸준한|Make steady progress.
+strategy|전략|We need a new strategy.
+strict|엄격한|My math teacher is strict.
+struggle|고군분투하다|Many students struggle with math.
+submit|제출하다|Submit your homework by Friday.
+suitable|적합한|This movie is suitable for kids.
+survey|설문 조사|We did a survey in class.
+task|과제|This task is too difficult.
+tax|세금|Everyone pays tax.
+terrible|끔찍한|The food was terrible.
+thief|도둑|The thief ran away.
+tiny|아주 작은|The baby has tiny hands.
+tool|도구|A hammer is a useful tool.
+total|총합의|What is the total price?
+tough|힘든|It was a tough day.
+track|트랙|They ran around the track.
+translate|번역하다|Can you translate this sentence?
+trap|덫|The mouse is in the trap.
+vehicle|차량|No vehicle is allowed here.
+version|버전|This is the new version.
+vision|시력|He has good vision.
+volume|음량|Turn down the volume.
+waterfall|폭포|The waterfall is beautiful.
+weird|기묘한|That's weird!
+wildlife|야생 동물|We must protect wildlife.`;
+
+/* ===================== 기본 유틸 ===================== */
+const DEMO = !CONFIG.firebaseProjectId;
+const PIDS = ["dad", "son"];
+const other = p => p === "dad" ? "son" : "dad";
+const P = id => CONFIG.players[id];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const josa = (w, a, b) => { const c = w.charCodeAt(w.length - 1); return (c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28) ? w + a : w + b; };
+const MEM = {};
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? (k in MEM ? MEM[k] : d) : JSON.parse(v); } catch (e) { return k in MEM ? MEM[k] : d; } },
+  set(k, v) { MEM[k] = v; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { delete MEM[k]; try { localStorage.removeItem(k); } catch (e) {} }
+};
+
+/* ----- 한국 시간 ----- */
+const KST_FMT = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" });
+function kst(d = new Date()) { const p = {}; KST_FMT.formatToParts(d).forEach(x => p[x.type] = x.value); return p; }
+function todayKey() { const p = kst(); return `${p.year}-${p.month}-${p.day}`; }
+const ymd = k => k.split("-").map(Number);
+function dateAdd(k, n) { const [y, m, d] = ymd(k); return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10); }
+function dayDiff(a, b) { const [y1, m1, d1] = ymd(a), [y2, m2, d2] = ymd(b); return Math.round((Date.UTC(y2, m2 - 1, d2) - Date.UTC(y1, m1 - 1, d1)) / 864e5); }
+function kstTime(k, hour) { const [y, m, d] = ymd(k); return Date.UTC(y, m - 1, d, hour - 9, 0, 0); }
+function weekStart(k) { const [y, m, d] = ymd(k); const dow = new Date(Date.UTC(y, m - 1, d)).getUTCDay(); return dateAdd(k, -((dow + 6) % 7)); }
+const DOW = ["일", "월", "화", "수", "목", "금", "토"];
+function prettyDate(k) { const [y, m, d] = ymd(k); return `${m}/${d}(${DOW[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]})`; }
+function now() { return Date.now(); }
+function revealAt(k) { return kstTime(k, CONFIG.resultHour); }
+function isRevealed(k) { return LS.get("duel-reveal-now", false) && DEMO_OR_TEST() ? true : now() >= revealAt(k); }
+function isOpen(k) { return DEMO || now() < revealAt(k); } // 체험 모드는 언제든 도전 가능
+const DEMO_OR_TEST = () => DEMO || CONFIG.testTools;
+function fmtDur(ms) { ms = Math.max(0, ms); const s = Math.floor(ms / 1000); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), ss = s % 60; return (h ? h + ":" : "") + String(m).padStart(h ? 2 : 1, "0") + ":" + String(ss).padStart(2, "0"); }
+const HOUR_TXT = (CONFIG.resultHour > 12 ? CONFIG.resultHour - 12 : CONFIG.resultHour) + "시";
+function fmtSec(ms) { return (ms / 1000).toFixed(1) + "초"; }
+
+/* ----- 시드 난수 (같은 날 = 같은 문제) ----- */
+function hashStr(s) { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function rng(seed) { let a = hashStr(seed); return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function shuffle(arr, r) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+/* ----- 단어 ----- */
+const parseW = (raw, adv) => raw.trim().split("\n").map(l => { const [w, m, s] = l.split("|").map(x => x.trim()); return { w, m, s, adv }; });
+const WORDS = parseW(WORDS_RAW, 0).concat(parseW(WORDS_ADV_RAW, 1));
+const WMAP = Object.fromEntries(WORDS.map(x => [x.w, x]));
+const ORDER = shuffle(WORDS.filter(x => !x.adv).map(x => x.w), rng("word-order-v1"));
+const ORDER_ADV = shuffle(WORDS.filter(x => x.adv).map(x => x.w), rng("word-order-adv-v1"));
+const ALL_ORDER = ORDER.concat(ORDER_ADV);
+function mTokens(m) { return m.replace(/\([^)]*\)/g, "").split(/[,·\/]/).map(t => t.replace(/[~\s]/g, "")).filter(Boolean); }
+function overlap(a, b) { const A = mTokens(a), B = mTokens(b); return A.some(x => B.some(y => x === y || (x.length >= 2 && y.length >= 2 && (x.includes(y) || y.includes(x))))); }
+function blankOut(s, w) { return s.replace(new RegExp("\\b" + w + "\\b", "i"), "_____"); }
+
+/* ===================== 문제 만들기 ===================== */
+/* ===================== 난이도 ===================== */
+const T_BASE = ["ox", "meaning", "listen", "word", "puzzle", "blank", "match", "ox", "listen", "blank", "puzzle", "boss"];
+const LEVELS = {
+  1: { name: "쉬움", desc: "중1 단어 · 시간 넉넉(+25%)", adv: 0, time: 1.25, study: 100, decoy: 0, types: T_BASE },
+  2: { name: "보통", desc: "중1 단어 · 처음 버전 그대로", adv: 0, time: 1, study: 90, decoy: 0, types: T_BASE },
+  3: { name: "조금 어려움", desc: "새 단어 8개 중 3개가 중2~3 · 시간 15%↓ · 보스 2문제 · 듣고 '뜻' 고르기 · 헷갈리는 보기 · 퍼즐 함정 글자 1개", adv: 3, time: 0.85, study: 90, decoy: 1,
+       types: ["ox", "meaning", "listen", "word", "puzzle", "blank", "match", "boss", "listen", "blank", "puzzle", "boss"] },
+  4: { name: "어려움", desc: "새 단어 6개가 중2~3 · 시간 25%↓ · 보스 3문제 · O/X 없음 · 퍼즐 함정 글자 2개 · 보스 첫 글자 힌트 없음", adv: 6, time: 0.75, study: 80, decoy: 2,
+       types: ["meaning", "listen", "word", "puzzle", "blank", "match", "boss", "listen", "blank", "puzzle", "boss", "boss"] },
+  5: { name: "최강", desc: "새 단어 전부 중2~3 · 시간 35%↓ · 보스 4문제", adv: 8, time: 0.65, study: 70, decoy: 2,
+       types: ["listen", "word", "boss", "blank", "match", "puzzle", "boss", "listen", "blank", "boss", "puzzle", "boss"] }
+};
+const lvOf = x => LEVELS[x] ? +x : 2;
+const TYPE_LABEL = { ox: "⚡ 스피드 O/X", meaning: "🧠 뜻 고르기", word: "🔤 단어 고르기", listen: "🎧 듣고 고르기", puzzle: "🧩 철자 퍼즐", blank: "📝 빈칸 채우기", match: "🔗 짝 맞추기", boss: "👾 보스 (점수 2배)" };
+
+function dayWords(date, review, lv) {
+  const L = LEVELS[lv];
+  const r = rng("day|" + date + "|" + CONFIG.room + "|" + lv);
+  const N = ORDER.length, NA = ORDER_ADV.length, n = CONFIG.newWordsPerDay, k = Math.min(n, L.adv);
+  const di = Math.max(0, dayDiff(CONFIG.startDate, date));
+  const fresh = [];
+  for (let i = 0; i < n - k; i++) fresh.push(ORDER[(di * n + i) % N]);
+  for (let i = 0; i < k; i++) fresh.push(ORDER_ADV[(di * n + i) % NA]);
+  let rv = shuffle([...new Set(review || [])].filter(w => WMAP[w] && !fresh.includes(w)).sort(), r).slice(0, CONFIG.reviewWordsPerDay);
+  const learned = Math.min(di * n, N);
+  const learnedPool = (learned >= 8 ? ORDER.slice(0, learned) : ORDER).concat(k ? ORDER_ADV.slice(0, Math.max(16, Math.min(di * n, NA))) : []);
+  const pool = shuffle(learnedPool.filter(w => !fresh.includes(w) && !rv.includes(w)), r);
+  const filled = [];
+  while (rv.length + filled.length < CONFIG.reviewWordsPerDay && pool.length) filled.push(pool.shift());
+  return { fresh, review: rv, extra: filled, r };
+}
+
+function pickDistractors(target, n, r, exclude = []) {
+  const t = WMAP[target]; const out = [];
+  for (const w of shuffle(ALL_ORDER, r)) {
+    if (out.length >= n) break;
+    if (w === target || exclude.includes(w) || out.includes(w)) continue;
+    if (overlap(WMAP[w].m, t.m)) continue;
+    if (out.some(o => overlap(WMAP[o].m, WMAP[w].m))) continue;
+    out.push(w);
+  }
+  return out;
+}
+function pickSoundAlike(target, n, r) {
+  const t = WMAP[target];
+  const near = shuffle(ALL_ORDER.filter(w => w !== target && w[0] === target[0] && Math.abs(w.length - target.length) <= 3 && !overlap(WMAP[w].m, t.m)), r).slice(0, n);
+  return near.length >= n ? near : near.concat(pickDistractors(target, n - near.length, r, near));
+}
+
+function buildQuiz(date, plan) {
+  const lv = lvOf(plan.level), TYPES = LEVELS[lv].types;
+  const { fresh, review, extra, r } = dayWords(date, plan.review, lv);
+  const all = [...fresh, ...review, ...extra];
+  let pool = shuffle(all, r);
+  const shortSlots = TYPES.map((t, i) => (t === "puzzle" || t === "boss") ? i : -1).filter(i => i >= 0);
+  const shorts = pool.filter(w => w.length >= 4 && w.length <= (lv >= 4 ? 10 : 8)).slice(0, shortSlots.length);
+  const assign = new Array(TYPES.length);
+  shortSlots.forEach((s, i) => { if (shorts[i]) assign[s] = shorts[i]; });
+  const rest = pool.filter(w => !assign.includes(w));
+  for (let i = 0; i < TYPES.length; i++) if (!assign[i]) assign[i] = rest.shift() || pool[i % pool.length];
+  const qs = TYPES.map((type, i) => makeQ(type, assign[i], r, all, lv));
+  return { date, lv, study: LEVELS[lv].study, fresh, review: [...review, ...extra], qs };
+}
+
+function makeQ(type, w, r, dayPool, lv) {
+  const t = WMAP[w], L = LEVELS[lv], hard = lv >= 3;
+  const q = { type, w, limit: 10 };
+  const engOpts = () => shuffle([w, ...(hard ? pickSoundAlike(w, 3, r) : pickDistractors(w, 3, r))], r);
+  if (type === "ox") {
+    q.limit = 6; q.truth = r() < 0.5;
+    q.shown = q.truth ? t.m : WMAP[pickDistractors(w, 1, r)[0]].m;
+  } else if (type === "meaning") {
+    q.limit = 10; q.opts = shuffle([w, ...pickDistractors(w, 3, r)], r).map(x => WMAP[x].m); q.ans = t.m;
+  } else if (type === "word") {
+    q.limit = 10; q.opts = engOpts(); q.ans = w;
+  } else if (type === "listen") {
+    q.limit = 12;
+    if (hard) { q.meaningMode = true; q.opts = shuffle([w, ...pickDistractors(w, 3, r)], r).map(x => WMAP[x].m); q.ans = t.m; }
+    else { q.opts = shuffle([w, ...pickSoundAlike(w, 3, r)], r); q.ans = w; }
+  } else if (type === "blank") {
+    q.limit = 15; q.sent = blankOut(t.s, w); q.opts = engOpts(); q.ans = w;
+  } else if (type === "puzzle") {
+    q.limit = Math.round(12 + w.length * 2 + L.decoy * 2);
+    const letters = w.split("");
+    for (let i = 0; i < L.decoy; i++) letters.push("aeioulnrst"[Math.floor(r() * 10)]);
+    let tiles = letters; let tries = 0;
+    do { tiles = shuffle(letters, r); tries++; } while (tiles.join("").startsWith(w) && tries < 10 && w.length > 1);
+    q.tiles = tiles;
+  } else if (type === "match") {
+    q.limit = 25;
+    const others = pickDistractors(w, 3, r, []).filter(Boolean);
+    const fromDay = shuffle(dayPool.filter(x => x !== w && !overlap(WMAP[x].m, t.m)), r);
+    const chosen = [w];
+    for (const x of [...fromDay, ...others]) { if (chosen.length >= 4) break; if (!chosen.some(c => overlap(WMAP[c].m, WMAP[x].m))) chosen.push(x); }
+    q.left = shuffle(chosen, r); q.right = shuffle(chosen, r);
+  } else if (type === "boss") {
+    q.limit = Math.round(10 + w.length * 1.6); q.firstHint = lv <= 3;
+  }
+  q.limit = Math.max(4, Math.round(q.limit * L.time));
+  return q;
+}
+
+/* ===================== 점수 ===================== */
+function speedBonus(remain, limit) { return Math.round(50 * Math.max(0, Math.min(1, remain / limit))); }
+function comboBonus(combo) { return combo >= 3 ? Math.min(50, (combo - 2) * 10) : 0; }
+
+/* ===================== 저장소 ===================== */
+const RemoteDB = {
+  url(path, extra = "") {
+    const key = CONFIG.firebaseApiKey ? "key=" + encodeURIComponent(CONFIG.firebaseApiKey) : "";
+    const q = [extra, key].filter(Boolean).join("&");
+    return `https://firestore.googleapis.com/v1/projects/${CONFIG.firebaseProjectId}/databases/(default)/documents/rooms/${encodeURIComponent(CONFIG.room)}/${path}${q ? "?" + q : ""}`;
+  },
+  async get(path) { const r = await fetch(this.url(path)); if (r.status === 404) return null; if (!r.ok) throw new Error("DB " + r.status); const j = await r.json(); return JSON.parse(j.fields.data.stringValue); },
+  async set(path, obj) { const r = await fetch(this.url(path), { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fields: { data: { stringValue: JSON.stringify(obj) } } }) }); if (!r.ok) throw new Error("DB " + r.status); },
+  async del(path) { await fetch(this.url(path), { method: "DELETE" }); },
+  async list(coll) {
+    const out = []; let tok = "";
+    do {
+      const r = await fetch(this.url(coll, "pageSize=300" + (tok ? "&pageToken=" + encodeURIComponent(tok) : "")));
+      if (!r.ok) throw new Error("DB " + r.status);
+      const j = await r.json();
+      (j.documents || []).forEach(d => { try { out.push(JSON.parse(d.fields.data.stringValue)); } catch (e) {} });
+      tok = j.nextPageToken || "";
+    } while (tok);
+    return out;
+  }
+};
+const LocalDB = {
+  all() { return LS.get("duel-demo-db", {}); },
+  save(a) { LS.set("duel-demo-db", a); },
+  async get(path) { return this.all()[path] ?? null; },
+  async set(path, obj) { const a = this.all(); a[path] = obj; this.save(a); },
+  async del(path) { const a = this.all(); delete a[path]; this.save(a); },
+  async list(coll) { const a = this.all(); return Object.keys(a).filter(k => k.startsWith(coll + "/")).map(k => a[k]); }
+};
+const DB = DEMO ? LocalDB : RemoteDB;
+
+/* ===================== 알림 (ntfy) ===================== */
+function appLink() { return CONFIG.appUrl || (location.origin + location.pathname); }
+async function notify(targets, title, message, opt = {}) {
+  const sendable = targets.filter(p => CONFIG.ntfyTopics[p]);
+  if (DEMO || !sendable.length) {
+    if (!opt.silent) toast(`📣 ${opt.at ? "(" + new Date(opt.at).toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit" }) + " 예약) " : ""}${title} — ${message}` + (DEMO ? " (체험 모드라 실제 알림은 안 가요)" : ""));
+    return;
+  }
+  for (const p of sendable) {
+    const body = { topic: CONFIG.ntfyTopics[p], title, message, tags: opt.tags || [], priority: opt.priority || 3, click: appLink() };
+    if (opt.at && opt.at > now() + 15000) body.delay = String(Math.floor(opt.at / 1000));
+    try { await fetch(CONFIG.ntfyServer.replace(/\/$/, "") + "/", { method: "POST", body: JSON.stringify(body) }); } catch (e) { console.warn("ntfy", e); }
+  }
+}
+
+/* ===================== 소리 ===================== */
+let AC = null;
+function beep(freqs, dur = 0.12, type = "sine", vol = 0.15) {
+  if (!LS.get("duel-sound", true)) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    let t = AC.currentTime;
+    freqs.forEach(f => { const o = AC.createOscillator(), g = AC.createGain(); o.type = type; o.frequency.value = f; g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur); o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + dur); t += dur * 0.8; });
+  } catch (e) {}
+}
+const SFX = { ok: () => beep([660, 880, 1320], .1), bad: () => beep([220, 160], .18, "square", .08), tick: () => beep([1000], .05, "sine", .06), win: () => beep([523, 659, 784, 1046], .15) };
+function vibrate(p) { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} }
+let VOICE = null;
+function pickVoice() { try { const vs = speechSynthesis.getVoices(); VOICE = vs.find(v => /en[-_]US/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null; } catch (e) {} }
+try { speechSynthesis.onvoiceschanged = pickVoice; pickVoice(); } catch (e) {}
+function speak(text, rate = 0.85) {
+  try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = "en-US"; u.rate = rate; if (VOICE) u.voice = VOICE; speechSynthesis.speak(u); } catch (e) { toast("이 기기에서는 소리 읽기가 안 돼요"); }
+}
+
+/* ===================== 화면 공통 ===================== */
+const app = document.getElementById("app");
+const S = { me: LS.get("duel-me", null), tab: "home", results: [], settings: null, game: null, detail: null, loading: false, err: "" };
+function toast(msg, ms = 3200) { const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), ms); }
+function confetti(n = 50) { const em = ["🎉", "⭐", "🏆", "✨", "🎊", "👑"]; for (let i = 0; i < n; i++) { const c = document.createElement("div"); c.className = "confetti"; c.textContent = em[i % em.length]; c.style.left = Math.random() * 100 + "vw"; c.style.animationDuration = 2 + Math.random() * 2.5 + "s"; c.style.animationDelay = Math.random() * .8 + "s"; document.body.appendChild(c); setTimeout(() => c.remove(), 5500); } }
+const DEFAULT_SETTINGS = { dailyPrize: "🍦 오늘의 왕: 디저트 고르기 권", weeklyPrize: "🍗 주간 챔피언: 주말 저녁 메뉴 선택권", monthlyPrize: "🎁 이달의 MVP: 원하는 선물 1개 (2만원 이내)", bonus: { dad: 0, son: 0 }, level: CONFIG.defaultLevel };
+
+/* ===================== 데이터 불러오기 / 집계 ===================== */
+async function loadAll() {
+  S.loading = true;
+  try {
+    const [res, st] = await Promise.all([DB.list("results"), DB.get("meta/settings")]);
+    S.results = res; S.settings = Object.assign({}, DEFAULT_SETTINGS, st || {}); S.err = "";
+    const tp = await DB.get("plans/" + todayKey()).catch(() => null); S.todayLevel = tp ? lvOf(tp.level) : null;
+  } catch (e) { S.err = "서버에 연결하지 못했어요. 인터넷을 확인해 주세요. (" + e.message + ")"; S.settings = S.settings || { ...DEFAULT_SETTINGS }; }
+  S.loading = false;
+}
+const resOf = (date, p) => S.results.find(x => x.date === date && x.player === p) || null;
+const total = x => x ? (x.score || 0) + (x.bonus || 0) : 0;
+
+function outcome(date) {
+  const d = resOf(date, "dad"), s = resOf(date, "son");
+  const dd = d && d.status === "done" ? d : null, sd = s && s.status === "done" ? s : null;
+  if (!dd && !sd) return { winner: null, dad: d, son: s, none: true };
+  if (dd && !sd) return { winner: "dad", dad: d, son: s, forfeit: true };
+  if (sd && !dd) return { winner: "son", dad: d, son: s, forfeit: true };
+  const a = total(dd), b = total(sd);
+  if (a !== b) return { winner: a > b ? "dad" : "son", dad: d, son: s };
+  if (dd.timeMs !== sd.timeMs) return { winner: dd.timeMs < sd.timeMs ? "dad" : "son", dad: d, son: s, byTime: true };
+  return { winner: "draw", dad: d, son: s };
+}
+function revealedDates() {
+  const set = new Set(S.results.map(x => x.date));
+  return [...set].filter(d => isRevealed(d)).sort();
+}
+function standing(dates) {
+  const st = { dad: { w: 0, l: 0, dr: 0, pts: 0 }, son: { w: 0, l: 0, dr: 0, pts: 0 }, days: 0 };
+  for (const d of dates) {
+    const o = outcome(d); if (o.none) continue; st.days++;
+    PIDS.forEach(p => { const x = resOf(d, p); if (x && x.status === "done") st[p].pts += total(x); });
+    if (o.winner === "draw") { st.dad.dr++; st.son.dr++; }
+    else { st[o.winner].w++; st[other(o.winner)].l++; }
+  }
+  const sc = p => st[p].w + st[p].dr * 0.5;
+  st.leader = st.days === 0 ? null : sc("dad") !== sc("son") ? (sc("dad") > sc("son") ? "dad" : "son") : st.dad.pts !== st.son.pts ? (st.dad.pts > st.son.pts ? "dad" : "son") : "draw";
+  return st;
+}
+function streak(p) {
+  let d = todayKey(), n = 0;
+  const done = k => { const x = resOf(k, p); return x && x.status === "done"; };
+  if (!done(d)) d = dateAdd(d, -1);
+  while (done(d)) { n++; d = dateAdd(d, -1); }
+  return n;
+}
+
+/* ===================== 렌더 ===================== */
+function nav() {
+  const t = [["home", "🏠", "오늘"], ["fame", "🏆", "시상식"], ["log", "📅", "기록"], ["set", "⚙️", "설정"]];
+  return `<div class="tabs">${t.map(([k, i, l]) => `<button data-act="tab" data-k="${k}" class="${S.tab === k ? "on" : ""}"><b>${i}</b>${l}</button>`).join("")}</div>`;
+}
+function render() {
+  if ((S.game && S.game.phase) || S.finishView) return; // 게임·완료 화면은 따로 그림
+  if (!S.me) return renderPick();
+  let html = DEMO ? `<div class="banner">🧪 체험 모드 — 이 기기 안에서만 저장돼요. 설정 탭에서 플레이어를 바꿔 혼자 대결해 볼 수 있어요.</div>` : "";
+  if (S.err) html += `<div class="banner">⚠️ ${esc(S.err)}</div>`;
+  if (S.detail) html += viewDetail(S.detail);
+  else if (S.tab === "home") html += viewHome();
+  else if (S.tab === "fame") html += viewFame();
+  else if (S.tab === "log") html += viewLog();
+  else html += viewSet();
+  app.innerHTML = html + nav();
+}
+function renderPick() {
+  app.innerHTML = `<div class="center" style="padding-top:40px"><div style="font-size:64px">⚔️</div><h1>영어 5분 대결</h1><p class="sub">이 폰의 주인은 누구인가요?</p>
+  ${PIDS.map(p => `<button class="btn ${p === "son" ? "" : "sec"}" data-act="pick" data-p="${p}" style="font-size:26px;padding:22px">${P(p).emoji} ${esc(P(p).name)}</button>`).join("")}
+  <p class="sub">처음 한 번만 고르면 돼요.</p></div>`;
+}
+
+function curLv() { return lvOf(S.todayLevel || (S.settings && S.settings.level) || CONFIG.defaultLevel); }
+function statusOf(x) { if (!x) return "😴 아직 안 함"; if (x.status === "done") return "✅ 완료"; return "⏳ 도전 중"; }
+function playerBox(p, date, crown) {
+  const x = resOf(date, p), rev = isRevealed(date);
+  const showScore = x && x.status === "done" && (rev || p === S.me);
+  return `<div class="pl ${p}"><span class="crown">${crown === p ? "👑" : crown === "draw" ? "🤝" : ""}</span><div class="emo">${P(p).emoji}</div><div class="nm">${esc(P(p).name)}${p === S.me ? " <span class='sub'>(나)</span>" : ""}</div>
+  <div class="st">${statusOf(x)}</div><div class="sc">${showScore ? total(x) + "점" : x && x.status === "done" ? "🔒" : "-"}</div></div>`;
+}
+function viewHome() {
+  const d = todayKey(), mine = resOf(d, S.me), opp = resOf(d, other(S.me));
+  const rev = isRevealed(d), open = isOpen(d);
+  const o = rev ? outcome(d) : null;
+  const prog = LS.get(progKey(d), null);
+  let btn;
+  if (mine && mine.status === "done") btn = rev ? `<button class="btn" data-act="detail" data-d="${d}">🏆 오늘 결과 자세히 보기</button>` : `<button class="btn sec" disabled>✅ 완료! 결과는 밤 ${HOUR_TXT}에 공개</button>`;
+  else if ((prog && !prog.done) || (mine && mine.status === "playing")) btn = `<button class="btn" data-act="resume">▶ 이어서 하기</button><p class="sub center">중간에 나갔던 문제는 오답 처리돼요.</p>`;
+  else if (open) btn = `<button class="btn" data-act="start">🚀 오늘의 대결 시작!</button><p class="sub center">외우기 ${LEVELS[curLv()].study}초 + 문제 12개 · 약 5분</p>`;
+  else btn = `<button class="btn sec" disabled>😢 오늘 대결은 마감됐어요. 내일 만나요!</button>`;
+  const wk = standing(revealedDates().filter(x => weekStart(x) === weekStart(d)));
+  const cd = rev ? "" : `<div class="center sub">결과 발표까지</div><div class="center count" id="cd">${fmtDur(revealAt(d) - now())}</div>`;
+  let resultLine = "";
+  if (rev && o && !o.none) {
+    resultLine = o.winner === "draw" ? `<div class="center big" style="font-size:22px">🤝 무승부!</div>` :
+      `<div class="center big" style="font-size:22px">👑 오늘의 왕: ${P(o.winner).emoji} ${esc(P(o.winner).name)}${o.forfeit ? " (부전승)" : o.byTime ? " (시간 차 승리)" : ""}</div><div class="prize center">${esc(S.settings.dailyPrize)}</div>`;
+  }
+  let oppNudge = "";
+  if (!rev && opp && opp.status === "done" && !(mine && mine.status === "done")) oppNudge = `<div class="card center" style="background:#5a1f3a">🔥 ${esc(josa(P(other(S.me)).name, "이", "가"))} 벌써 다 풀었어요! 빨리 도전하세요!</div>`;
+  return `<div class="row between"><div><h1>⚔️ 영어 5분 대결</h1><div class="sub">${prettyDate(d)} · 난이도 ${curLv()}단계 ${LEVELS[curLv()].name}</div></div><div class="center"><div style="font-size:12px" class="sub">연속</div><div class="jua" style="font-size:20px">🔥${streak(S.me)}일</div></div></div>
+  <div class="card">${cd}<div class="vs" style="margin-top:10px">${playerBox("dad", d, o && o.winner)}<div class="vsmark">VS</div>${playerBox("son", d, o && o.winner)}</div>${resultLine}</div>
+  ${oppNudge}${btn}
+  <div class="card"><div class="row between"><h3 style="margin:0">📆 이번 주 승부</h3><span class="sub">월~일</span></div>${weekBar(wk)}<div class="sub" style="margin-top:6px">${esc(S.settings.weeklyPrize)}</div></div>`;
+}
+function weekBar(st) {
+  const a = st.dad.w + st.dad.dr * .5, b = st.son.w + st.son.dr * .5, t = a + b || 1;
+  return `<div class="row between jua" style="font-size:20px;margin-top:8px"><span style="color:var(--dad)">${P("dad").emoji} ${st.dad.w}승</span><span class="sub" style="font-size:14px">${st.dad.dr ? "무 " + st.dad.dr : ""}</span><span style="color:var(--son)">${st.son.w}승 ${P("son").emoji}</span></div>
+  <div class="bar2"><div class="d" style="width:${a / t * 100}%"></div><div class="s" style="width:${b / t * 100}%"></div></div>
+  <div class="row between sub"><span>총 ${st.dad.pts}점</span><span>${st.leader && st.leader !== "draw" ? "선두: " + P(st.leader).emoji : st.leader === "draw" ? "팽팽!" : "아직 기록 없음"}</span><span>총 ${st.son.pts}점</span></div>`;
+}
+function viewFame() {
+  const d = todayKey(), dates = revealedDates();
+  const wk = standing(dates.filter(x => weekStart(x) === weekStart(d)));
+  const mo = standing(dates.filter(x => x.slice(0, 7) === d.slice(0, 7)));
+  const weeks = [...new Set(dates.map(weekStart))].filter(w => w !== weekStart(d)).sort().reverse();
+  const months = [...new Set(dates.map(x => x.slice(0, 7)))].filter(m => m !== d.slice(0, 7)).sort().reverse();
+  const champ = (st) => st.leader === "draw" ? "🤝 공동 우승" : st.leader ? `${P(st.leader).emoji} ${esc(P(st.leader).name)}` : "-";
+  const daysWon = PIDS.map(p => dates.filter(x => outcome(x).winner === p).length);
+  return `<h1>🏆 시상식</h1>
+  <div class="card"><h3>📆 이번 주 챔피언 레이스</h3>${weekBar(wk)}<div class="prize">${esc(S.settings.weeklyPrize)}</div><div class="sub" style="margin-top:6px">일요일 밤 ${HOUR_TXT} 결과로 확정돼요. 승수가 같으면 총점으로 가려요.</div></div>
+  <div class="card"><h3>🗓️ ${+d.slice(5, 7)}월 MVP 레이스</h3>${weekBar(mo)}<div class="prize">${esc(S.settings.monthlyPrize)}</div></div>
+  <div class="card"><h3>🎖️ 역대 주간 챔피언</h3>${weeks.length ? `<table><tr><th>주</th><th>챔피언</th><th>전적</th></tr>${weeks.map(w => { const st = standing(dates.filter(x => weekStart(x) === w)); return `<tr><td>${prettyDate(w)}~</td><td>${champ(st)}</td><td class="sub">${st.dad.w}:${st.son.w}</td></tr>`; }).join("")}</table>` : `<div class="sub">첫 주가 끝나면 여기에 이름이 올라가요!</div>`}</div>
+  <div class="card"><h3>🥇 역대 이달의 MVP</h3>${months.length ? `<table>${months.map(m => { const st = standing(dates.filter(x => x.slice(0, 7) === m)); return `<tr><td>${m.replace("-", "년 ")}월</td><td>${champ(st)}</td><td class="sub">${st.dad.w}:${st.son.w}</td></tr>`; }).join("")}</table>` : `<div class="sub">첫 달이 끝나면 여기에 이름이 올라가요!</div>`}</div>
+  <div class="card"><h3>📊 통산 기록</h3><div class="row between jua" style="font-size:19px"><span>${P("dad").emoji} ${daysWon[0]}승 · 🔥${streak("dad")}일</span><span>${P("son").emoji} ${daysWon[1]}승 · 🔥${streak("son")}일</span></div></div>`;
+}
+function viewLog() {
+  const dates = [...new Set(S.results.map(x => x.date))].sort().reverse().slice(0, 60);
+  if (!dates.length) return `<h1>📅 기록</h1><div class="card sub">아직 기록이 없어요. 오늘 첫 대결을 시작해 보세요!</div>`;
+  return `<h1>📅 기록</h1><div class="card"><table><tr><th>날짜</th><th>${P("dad").emoji}</th><th>${P("son").emoji}</th><th>승자</th></tr>
+  ${dates.map(d => { const rev = isRevealed(d), o = outcome(d); const cell = p => { const x = resOf(d, p); if (!x) return "-"; if (x.status !== "done") return "⏳"; return rev || p === S.me ? total(x) : "🔒"; }; return `<tr class="click" data-act="detail" data-d="${d}"><td>${prettyDate(d)}</td><td>${cell("dad")}</td><td>${cell("son")}</td><td>${!rev ? "🔒" : o.winner === "draw" ? "🤝" : o.winner ? P(o.winner).emoji : "-"}</td></tr>`; }).join("")}</table><div class="sub" style="margin-top:6px">날짜를 누르면 오답노트를 볼 수 있어요.</div></div>`;
+}
+function viewDetail(d) {
+  const rev = isRevealed(d), o = outcome(d);
+  const box = p => { const x = resOf(d, p); const show = x && x.status === "done" && (rev || p === S.me);
+    return `<div class="pl ${p}"><span class="crown">${rev && o.winner === p ? "👑" : rev && o.winner === "draw" ? "🤝" : ""}</span><div class="emo">${P(p).emoji}</div><div class="nm">${esc(P(p).name)}</div>
+    ${show ? `<div class="sc">${total(x)}점</div><div class="st">정답 ${x.correct}/${x.total} · ${fmtSec(x.timeMs)}${x.bonus ? `<br>핸디캡 +${x.bonus}` : ""}<br>최고 콤보 ${x.maxCombo || 0}</div>` : `<div class="sc">${x && x.status === "done" ? "🔒" : "-"}</div><div class="st">${statusOf(x)}</div>`}</div>`; };
+  const wrong = {};
+  PIDS.forEach(p => { const x = resOf(d, p); if (x && (rev || p === S.me)) (x.wrongWords || []).forEach(w => { (wrong[w] = wrong[w] || []).push(p); }); });
+  const wl = Object.keys(wrong).filter(w => WMAP[w]);
+  return `<button class="btn sec small" data-act="back" style="width:auto;display:inline-block;padding:8px 14px">← 뒤로</button><h1>${prettyDate(d)} 결과</h1>
+  <div class="card"><div class="vs">${box("dad")}<div class="vsmark">VS</div>${box("son")}</div>
+  ${rev && !o.none ? `<div class="center big" style="font-size:22px;margin-top:10px">${o.winner === "draw" ? "🤝 무승부!" : `👑 ${esc(P(o.winner).name)} 승리!${o.forfeit ? " (부전승)" : o.byTime ? " (점수 같아서 더 빠른 쪽 승)" : ""}`}</div>` : !rev ? `<div class="center sub" style="margin-top:10px">🔒 상대 점수는 밤 ${HOUR_TXT}에 공개돼요</div>` : ""}</div>
+  <div class="card"><h3>📒 오답노트</h3>${wl.length ? wl.map(w => wordCard(w, wrong[w].map(p => P(p).emoji).join(""))).join("") : `<div class="sub">틀린 단어가 없어요. 대단해요! 🎉</div>`}
+  ${wl.length ? `<div class="sub" style="margin-top:6px">여기 단어들은 다음 날 복습 문제로 다시 나와요.</div>` : ""}</div>`;
+}
+function wordCard(w, tag = "") {
+  const t = WMAP[w]; if (!t) return "";
+  const s = esc(t.s).replace(new RegExp("\\b(" + w + ")\\b", "i"), "<b>$1</b>");
+  return `<div class="wcard"><div><div class="w">${esc(w)}${tag ? `<span class="tag ${tag === "복습" ? "rv" : ""}">${tag}</span>` : ""}</div><div class="m">${esc(t.m)}</div><div class="s">${s}</div></div><button class="spk" data-act="say" data-w="${esc(w)}">🔊</button></div>`;
+}
+function viewSet() {
+  const st = S.settings;
+  return `<h1>⚙️ 설정</h1>
+  <div class="card"><h3>나는</h3><div class="jua" style="font-size:24px">${P(S.me).emoji} ${esc(P(S.me).name)}</div>
+  <button class="btn sec small" data-act="switch">${S.switchArm ? "한 번 더 누르면 바뀌어요" : "플레이어 바꾸기"}</button></div>
+  <div class="card"><h3>🎚️ 난이도 (둘이 같이 적용)</h3>
+  <div class="row" style="gap:6px">${[1, 2, 3, 4, 5].map(n => `<button class="btn ${lvOf(st.level) === n ? "" : "sec"} small" style="margin:4px 0" data-act="lvl" data-v="${n}">${n}</button>`).join("")}</div>
+  <div class="jua" style="font-size:19px;margin-top:6px">${lvOf(st.level)}단계 · ${LEVELS[lvOf(st.level)].name}</div><div class="sub">${LEVELS[lvOf(st.level)].desc}</div>
+  <div class="sub" style="margin-top:8px">💡 오늘 문제가 이미 만들어졌다면(누군가 도전을 시작했다면) <b>내일 문제부터</b> 바뀐 난이도가 적용돼요. 두 사람은 항상 같은 난이도로 겨뤄요.</div></div>
+  <div class="card"><h3>🔊 효과음</h3><button class="btn sec small" data-act="sound">${LS.get("duel-sound", true) ? "켜짐 (누르면 끔)" : "꺼짐 (누르면 켬)"}</button></div>
+  <div class="card"><h3>🎁 상품 (둘이 같이 보여요)</h3>
+  <div class="sub">하루 승자</div><input class="txt" id="pz-d" value="${esc(st.dailyPrize)}">
+  <div class="sub">주간 챔피언</div><input class="txt" id="pz-w" value="${esc(st.weeklyPrize)}">
+  <div class="sub">이달의 MVP</div><input class="txt" id="pz-m" value="${esc(st.monthlyPrize)}">
+  <h3>⚖️ 핸디캡 (하루 점수에 더해 줄 보너스)</h3>
+  <div class="row">${PIDS.map(p => `<div style="flex:1"><div class="sub">${P(p).emoji} ${esc(P(p).name)}</div><input class="txt" id="bn-${p}" type="number" inputmode="numeric" value="${(st.bonus || {})[p] || 0}"></div>`).join("")}</div>
+  <div class="sub">한쪽이 계속 지면 보너스 점수로 균형을 맞춰 보세요. (최고 점수는 난이도에 따라 하루 약 2,300~2,700점)</div>
+  <button class="btn small" data-act="saveSet">저장</button></div>
+  <div class="card"><h3>📡 연결 상태</h3><div class="sub">${DEMO ? "체험 모드 (서버 없음)" : "서버 연결: Firebase · 방 " + esc(CONFIG.room)}<br>알림: ${CONFIG.ntfyTopics[S.me] ? "ntfy 토픽 " + esc(CONFIG.ntfyTopics[S.me]) : "설정 안 됨"}</div>
+  ${!DEMO && CONFIG.ntfyTopics[S.me] ? `<button class="btn sec small" data-act="testPush">내 폰에 테스트 알림 보내기</button>` : ""}</div>
+  ${DEMO_OR_TEST() ? `<div class="card"><h3>🧪 테스트 도구</h3>
+  <button class="btn sec small" data-act="revealNow">${LS.get("duel-reveal-now", false) ? "✅ 결과 바로 공개 중 (누르면 끔)" : "결과 바로 공개하기 (10시 안 기다림)"}</button>
+  <button class="btn sec small" data-act="fakeOpp">상대 기록 가짜로 만들기 (오늘)</button>
+  <button class="btn sec small" data-act="resetToday">오늘 내 기록 지우기</button>
+  <button class="btn sec small" data-act="fakeWeek">지난 2주 가짜 기록 만들기</button></div>` : ""}
+  <p class="sub center">단어 ${ORDER.length + ORDER_ADV.length}개 (중1 ${ORDER.length} + 중2~3 ${ORDER_ADV.length}) · 하루 새 단어 ${CONFIG.newWordsPerDay}개 + 복습 ${CONFIG.reviewWordsPerDay}개</p>`;
+}
+
+/* ===================== 게임 진행 ===================== */
+const progKey = d => `duel-prog-${d}-${S.me}`;
+const resPath = (d, p) => `results/${d}_${p}`;
+
+async function getPlan(date) {
+  let plan = await DB.get("plans/" + date);
+  if (plan) return plan;
+  const y = dateAdd(date, -1);
+  const prev = await Promise.all(PIDS.map(p => DB.get(resPath(y, p))));
+  const review = [...new Set(prev.filter(Boolean).flatMap(x => x.wrongWords || []))].sort();
+  plan = { date, review, level: lvOf((S.settings && S.settings.level) || CONFIG.defaultLevel), createdBy: S.me, createdAt: now() };
+  await DB.set("plans/" + date, plan);
+  return plan;
+}
+
+async function startGame(resume) {
+  const date = todayKey();
+  if (!resume && !isOpen(date)) { toast("오늘 대결은 마감됐어요"); return; }
+  app.innerHTML = `<div class="center" style="padding-top:120px"><div class="cd" style="font-size:60px">📚</div><div class="sub">오늘의 문제 준비 중...</div></div>`;
+  let plan;
+  try { plan = await getPlan(date); } catch (e) { toast("문제를 불러오지 못했어요: " + e.message); S.game = null; render(); return; }
+  const quiz = buildQuiz(date, plan);
+  let prog = LS.get(progKey(date), null);
+  if (prog && prog.done) { toast("오늘은 이미 끝냈어요!"); S.game = null; await loadAll(); render(); return; }
+  if (!prog) {
+    const remote = await DB.get(resPath(date, S.me)).catch(() => null);
+    if (remote && remote.status === "done") { toast("오늘은 이미 끝냈어요!"); await loadAll(); render(); return; }
+    if (remote && remote.status === "playing") prog = { idx: remote.answers.length, answers: remote.answers, score: remote.score, combo: 0, maxCombo: remote.maxCombo || 0, startedAt: remote.startedAt, studied: true };
+  }
+  S.game = { date, quiz, qs: quiz.qs, idx: 0, answers: [], score: 0, combo: 0, maxCombo: 0, startedAt: now(), phase: "study" };
+  if (prog && !prog.done) {
+    Object.assign(S.game, { idx: prog.idx, answers: prog.answers, score: prog.score, combo: 0, maxCombo: prog.maxCombo || 0, startedAt: prog.startedAt });
+    if (prog.inQ != null && prog.inQ === prog.idx) {
+      recordAnswer({ ok: false, ms: S.game.qs[prog.idx].limit * 1000, pts: 0, left: true, wrongs: [S.game.qs[prog.idx].w] }, true);
+      toast("나갔던 문제는 오답 처리됐어요 😅");
+    }
+    if (S.game.idx >= S.game.qs.length) return finishGame();
+    if (prog.studied) return countdown();
+  }
+  showStudy();
+}
+
+function showStudy() {
+  const g = S.game; g.phase = "study";
+  const SEC = g.quiz.study || CONFIG.studySeconds;
+  const end = now() + SEC * 1000;
+  app.innerHTML = `<div class="qtop"><span>📖 오늘의 단어 외우기</span><span class="count" id="st">${SEC}</span></div>
+  <div class="timer"><div id="tbar" style="width:100%"></div></div>
+  <div class="sub">새 단어 ${g.quiz.fresh.length}개 + 복습 ${g.quiz.review.length}개. 🔊를 눌러 발음도 들어 보세요!</div>
+  ${g.quiz.fresh.map(w => wordCard(w, WMAP[w].adv ? "NEW·중2~3" : "NEW")).join("")}${g.quiz.review.map(w => wordCard(w, "복습")).join("")}
+  <button class="btn" data-act="ready" style="position:sticky;bottom:10px">다 외웠어! 시작 →</button>`;
+  clearInterval(g.tick);
+  g.tick = setInterval(() => {
+    const left = end - now(); const el = document.getElementById("st"), bar = document.getElementById("tbar");
+    if (el) el.textContent = Math.ceil(Math.max(0, left) / 1000); if (bar) bar.style.width = Math.max(0, left / (SEC * 10)) + "%";
+    if (left <= 0) { clearInterval(g.tick); countdown(); }
+  }, 200);
+}
+
+async function countdown() {
+  const g = S.game; clearInterval(g.tick); g.phase = "count";
+  saveProg({ studied: true });
+  if (g.idx === 0 && !g.answers.length) DB.set(resPath(g.date, S.me), partialDoc()).catch(() => {});
+  for (const n of ["3", "2", "1", "GO!"]) {
+    app.innerHTML = `<div class="overlay"><div class="cd">${n}</div><div class="sub">문제마다 제한 시간이 있어요. 앱을 나가면 오답!</div></div>`;
+    beep([n === "GO!" ? 1046 : 660], .12);
+    await new Promise(r => setTimeout(r, 700));
+  }
+  showQ();
+}
+
+function partialDoc() {
+  const g = S.game;
+  return { player: S.me, date: g.date, status: "playing", answers: g.answers, score: g.score, maxCombo: g.maxCombo, startedAt: g.startedAt, wrongWords: wrongList() };
+}
+function wrongList() { return [...new Set(S.game.answers.flatMap(a => a.wrongs || []))]; }
+function saveProg(extra = {}) { const g = S.game; const cur = LS.get(progKey(g.date), {}) || {}; LS.set(progKey(g.date), Object.assign(cur, { idx: g.idx, answers: g.answers, score: g.score, maxCombo: g.maxCombo, startedAt: g.startedAt }, extra)); }
+
+function showQ() {
+  const g = S.game, q = g.qs[g.idx];
+  g.phase = "q"; g.qStart = now(); g.locked = false; g.pz = []; g.kb = ""; g.mm = { sel: null, done: [], mistakes: 0, wrongs: [] };
+  saveProg({ inQ: g.idx });
+  const head = `<div class="qtop"><span>Q${g.idx + 1}/${g.qs.length}</span><span class="typetag">${(q.meaningMode ? "🎧 듣고 뜻 고르기" : TYPE_LABEL[q.type])}</span><span>⭐${g.score}</span></div>
+  <div class="timer" id="tw"><div id="tbar" style="width:100%"></div></div>${g.combo >= 2 ? `<div class="combo">🔥 ${g.combo} 콤보!</div>` : ""}`;
+  let body = "";
+  const t = WMAP[q.w];
+  if (q.type === "ox") body = `<div class="prompt">${esc(q.w)}</div><div class="center jua" style="font-size:22px">=</div><div class="prompt ko">${esc(q.shown)}</div><div class="hint">맞으면 O, 틀리면 X!</div><div class="ox"><button class="opt" data-act="ox" data-v="1">⭕</button><button class="opt" data-act="ox" data-v="0">❌</button></div>`;
+  else if (q.type === "meaning") body = `<div class="prompt">${esc(q.w)}</div><div class="hint">알맞은 뜻은?</div><div class="opts">${q.opts.map((o, i) => `<button class="opt" data-act="opt" data-i="${i}">${esc(o)}</button>`).join("")}</div>`;
+  else if (q.type === "word") body = `<div class="prompt ko">${esc(t.m)}</div><div class="hint">이 뜻의 영어 단어는?</div><div class="opts">${q.opts.map((o, i) => `<button class="opt" data-act="opt" data-i="${i}">${esc(o)}</button>`).join("")}</div>`;
+  else if (q.type === "listen") body = `<button class="speaker" data-act="sayq">🔊</button><div class="hint">${q.meaningMode ? "잘 듣고 그 단어의 <b>뜻</b>을 고르세요 (여러 번 들어도 OK)" : "잘 듣고 들린 단어를 고르세요 (여러 번 들어도 OK)"}</div><div class="opts">${q.opts.map((o, i) => `<button class="opt" data-act="opt" data-i="${i}">${esc(o)}</button>`).join("")}</div>`;
+  else if (q.type === "blank") body = `<div class="sentence">${esc(q.sent).replace("_____", "<u>_____</u>")}</div><div class="hint">빈칸에 들어갈 단어는?</div><div class="opts">${q.opts.map((o, i) => `<button class="opt" data-act="opt" data-i="${i}">${esc(o)}</button>`).join("")}</div>`;
+  else if (q.type === "puzzle") body = `<div class="prompt ko">${esc(t.m)}</div><div class="hint">글자를 순서대로 눌러 단어를 완성하세요 (칸을 누르면 지워져요)${q.tiles.length > q.w.length ? "<br>⚠️ 필요 없는 함정 글자가 섞여 있어요!" : ""}</div><div id="pzarea"></div>`;
+  else if (q.type === "match") body = `<div class="hint" style="margin-top:12px">영어와 뜻을 짝지어 주세요! 틀리면 감점</div><div id="marea"></div>`;
+  else if (q.type === "boss") body = `<div class="prompt ko">👾 ${esc(t.m)}</div><div class="hint">철자를 직접 입력! ${q.firstHint ? `첫 글자 <b>${esc(q.w[0])}</b> · ` : ""}${q.w.length}글자</div><div id="kbarea"></div>`;
+  app.innerHTML = head + `<div id="qb">${body}</div>`;
+  if (q.type === "puzzle") drawPuzzle();
+  if (q.type === "match") drawMatch();
+  if (q.type === "boss") drawKb();
+  if (q.type === "listen") setTimeout(() => speak(q.w), 250);
+  clearInterval(g.tick); let lastSec = 99;
+  g.tick = setInterval(() => {
+    const el = now() - g.qStart, left = q.limit * 1000 - el;
+    const bar = document.getElementById("tbar"), tw = document.getElementById("tw");
+    if (bar) bar.style.width = Math.max(0, left / (q.limit * 10)) + "%";
+    if (tw && left < 3000) tw.classList.add("hurry");
+    const sec = Math.ceil(left / 1000); if (sec <= 3 && sec < lastSec && sec > 0) { SFX.tick(); lastSec = sec; }
+    if (left <= 0) timeUp();
+  }, 100);
+}
+
+function timeUp() {
+  const g = S.game, q = g.qs[g.idx]; if (g.locked) return;
+  if (q.type === "match") { const n = g.mm.done.length; const wr = q.left.filter(w => !g.mm.done.includes(w)); return answer(false, { pts: n * 25, wrongs: [...new Set([...wr, ...g.mm.wrongs])], timeout: true }); }
+  answer(false, { timeout: true });
+}
+
+function answer(ok, extra = {}) {
+  const g = S.game, q = g.qs[g.idx]; if (g.locked) return; g.locked = true; clearInterval(g.tick);
+  const ms = Math.min(now() - g.qStart, q.limit * 1000), remain = q.limit * 1000 - ms;
+  let pts = extra.pts || 0, cb = 0;
+  if (ok) {
+    const base = extra.base ?? 100, mult = q.type === "boss" ? 2 : 1;
+    pts = Math.round((base + speedBonus(remain, q.limit * 1000)) * mult);
+    if (extra.keepCombo !== false) { g.combo++; cb = comboBonus(g.combo); } else g.combo = 0;
+    pts += cb;
+  } else g.combo = 0;
+  g.maxCombo = Math.max(g.maxCombo, g.combo);
+  recordAnswer({ ok, ms, pts, timeout: !!extra.timeout, left: !!extra.left, wrongs: ok ? (extra.wrongs || []) : (extra.wrongs || [q.w]) });
+  if (ok) { SFX.ok(); } else { SFX.bad(); vibrate(150); }
+  feedback(ok, pts, cb, extra);
+}
+function recordAnswer(a, silent) {
+  const g = S.game, q = g.qs[g.idx];
+  g.answers.push(Object.assign({ w: q.w, t: q.type }, a)); g.score += a.pts; g.idx++;
+  saveProg({ inQ: null });
+  DB.set(resPath(g.date, S.me), partialDoc()).catch(() => {});
+}
+function feedback(ok, pts, cb, extra) {
+  const g = S.game, q = g.qs[g.idx - 1], t = WMAP[q.w];
+  const msg = ok ? ["완벽해!", "좋아!", "정답!", "천재인데?", "나이스!"][Math.floor(Math.random() * 5)] : extra.left ? "앱을 나가서 오답!" : extra.timeout ? "시간 초과!" : "아깝다!";
+  const ov = document.createElement("div"); ov.className = "overlay";
+  ov.innerHTML = `<div class="huge">${ok ? "⭕" : extra.left ? "🚪" : extra.timeout ? "⏰" : "❌"}</div><div class="msg">${msg}${pts ? ` +${pts}` : ""}</div>${cb ? `<div class="combo">🔥 콤보 보너스 +${cb}</div>` : ""}
+  <div class="ans"><b>${esc(q.w)}</b><br>${esc(t.m)}</div>${extra.left ? `<button class="btn" data-act="next" style="max-width:300px;margin-top:20px">계속하기</button>` : ""}`;
+  document.body.appendChild(ov); g.phase = "fb"; g.ov = ov;
+  if (!extra.left) g.fbTimer = setTimeout(nextQ, ok ? 900 : 1600);
+}
+function nextQ() {
+  const g = S.game; if (!g) return; clearTimeout(g.fbTimer); if (g.ov) { g.ov.remove(); g.ov = null; }
+  if (g.idx >= g.qs.length) finishGame(); else showQ();
+}
+
+/* --- 퍼즐 --- */
+function drawPuzzle() {
+  const g = S.game, q = g.qs[g.idx];
+  document.getElementById("pzarea").innerHTML = `<div class="slots" id="slots">${q.w.split("").map((_, i) => `<div class="slot ${g.pz[i] != null ? "f" : ""}" data-act="pzundo">${g.pz[i] != null ? esc(q.tiles[g.pz[i]]) : ""}</div>`).join("")}</div>
+  <div class="tiles">${q.tiles.map((c, i) => `<button class="tile" data-act="pz" data-i="${i}" ${g.pz.includes(i) ? "disabled" : ""}>${esc(c)}</button>`).join("")}</div>`;
+}
+function pzTap(i) {
+  const g = S.game, q = g.qs[g.idx]; if (g.locked || g.pz.includes(i)) return;
+  g.pz.push(i); beep([500 + g.pz.length * 60], .05);
+  if (g.pz.length === q.w.length) {
+    const word = g.pz.map(k => q.tiles[k]).join("");
+    if (word === q.w) return answer(true);
+    drawPuzzle(); const s = document.getElementById("slots"); s.classList.add("shake"); SFX.bad(); vibrate(80);
+    setTimeout(() => { g.pz = []; if (!g.locked) drawPuzzle(); }, 450); return;
+  }
+  drawPuzzle();
+}
+/* --- 짝 맞추기 --- */
+function drawMatch() {
+  const g = S.game, q = g.qs[g.idx], m = g.mm;
+  document.getElementById("marea").innerHTML = `<div class="match"><div class="col">${q.left.map(w => `<button class="mi ${m.done.includes(w) ? "done" : m.sel === w ? "sel" : ""}" data-act="mL" data-w="${esc(w)}" ${m.done.includes(w) ? "disabled" : ""}>${esc(w)}</button>`).join("")}</div>
+  <div class="col">${q.right.map(w => `<button class="mi ${m.done.includes(w) ? "done" : ""}" data-act="mR" data-w="${esc(w)}" ${m.done.includes(w) ? "disabled" : ""} style="font-size:16px">${esc(WMAP[w].m)}</button>`).join("")}</div></div>`;
+}
+function matchTap(side, w, el) {
+  const g = S.game, q = g.qs[g.idx], m = g.mm; if (g.locked) return;
+  if (side === "L") { m.sel = w; beep([600], .04); return drawMatch(); }
+  if (!m.sel) { toast("왼쪽 영어 단어를 먼저 골라요", 1200); return; }
+  if (m.sel === w) {
+    m.done.push(w); m.sel = null; beep([700, 900], .07);
+    if (m.done.length === q.left.length) return answer(true, { base: Math.max(25, 100 - 25 * m.mistakes), keepCombo: m.mistakes === 0, wrongs: m.wrongs });
+    drawMatch();
+  } else {
+    m.mistakes++; m.wrongs.push(m.sel); el.classList.add("err", "shake"); SFX.bad(); vibrate(80); m.sel = null;
+    setTimeout(drawMatch, 400);
+  }
+}
+/* --- 보스 키보드 --- */
+function drawKb() {
+  const g = S.game, q = g.qs[g.idx];
+  const rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
+  document.getElementById("kbarea").innerHTML = `<div class="slots" id="slots">${q.w.split("").map((_, i) => `<div class="slot ${g.kb[i] ? "f" : ""}">${esc(g.kb[i] || "")}</div>`).join("")}</div>
+  <div class="kb">${rows.map((r, ri) => `<div class="r">${ri === 2 ? `<button class="wide" data-act="kbDel">⌫</button>` : ""}${r.split("").map(c => `<button data-act="kb" data-k="${c}">${c}</button>`).join("")}${ri === 2 ? `<button class="wide go" data-act="kbGo">확인</button>` : ""}</div>`).join("")}</div>`;
+}
+function kbKey(k) { const g = S.game, q = g.qs[g.idx]; if (g.locked) return; if (g.kb.length < q.w.length) g.kb += k; drawKb(); if (g.kb.length === q.w.length) kbGo(); }
+function kbGo() {
+  const g = S.game, q = g.qs[g.idx]; if (g.locked) return;
+  if (g.kb.toLowerCase() === q.w.toLowerCase()) return answer(true);
+  if (g.kb.length < q.w.length) { toast(`${q.w.length}글자를 채워 주세요`, 1200); return; }
+  const s = document.getElementById("slots"); s && s.classList.add("shake"); SFX.bad(); vibrate(80);
+  setTimeout(() => { g.kb = ""; if (!g.locked) drawKb(); }, 450);
+}
+
+/* --- 끝 --- */
+async function finishGame() {
+  const g = S.game; clearInterval(g.tick); g.phase = "done";
+  const correct = g.answers.filter(a => a.ok).length, timeMs = g.answers.reduce((s, a) => s + a.ms, 0);
+  const bonus = Number((S.settings && S.settings.bonus || {})[S.me]) || 0;
+  const doc = { player: S.me, date: g.date, status: "done", score: g.score, bonus, correct, total: g.qs.length, timeMs, maxCombo: g.maxCombo, answers: g.answers, wrongWords: wrongList(), startedAt: g.startedAt, finishedAt: now() };
+  app.innerHTML = `<div class="center" style="padding-top:100px"><div class="cd" style="font-size:60px">💾</div><div class="sub">결과 저장 중...</div></div>`;
+  let saved = false;
+  for (let i = 0; i < 3 && !saved; i++) { try { await DB.set(resPath(g.date, S.me), doc); saved = true; } catch (e) { await new Promise(r => setTimeout(r, 1500)); } }
+  LS.set(progKey(g.date), { done: true });
+  let oppDone = false;
+  try { const o = await DB.get(resPath(g.date, other(S.me))); oppDone = !!(o && o.status === "done"); } catch (e) {}
+  const me = P(S.me), opp = P(other(S.me));
+  if (!oppDone) {
+    await notify([other(S.me)], `${me.emoji} ${josa(me.name, "이", "가")} 다 풀었어!`, `오늘 영어 대결 끝! ${opp.name}도 빨리 도전해! 🔥 (마감 밤 ${HOUR_TXT})`, { tags: ["fire"], priority: 4 });
+    if (isOpen(g.date)) await notify(PIDS, "🏆 오늘의 결과 발표!", "누가 이겼을까? 앱을 열어서 확인해 보세요 👀", { at: revealAt(g.date), tags: ["trophy"], priority: 4, silent: !DEMO });
+  } else {
+    await notify([other(S.me)], `${me.emoji} ${me.name}도 다 풀었어!`, `둘 다 끝! 결과는 밤 ${HOUR_TXT}에 공개돼요 🔒`, { tags: ["lock"] });
+  }
+  confetti(30); SFX.win();
+  const wl = doc.wrongWords;
+  app.innerHTML = `<div class="center" style="padding-top:24px"><div style="font-size:70px">🎉</div><h1>오늘 도전 완료!</h1>
+  <div class="count" style="font-size:52px">${doc.score}점</div><div class="sub">정답 ${correct}/${g.qs.length} · ${fmtSec(timeMs)} · 최고 콤보 ${g.maxCombo}${bonus ? ` · 핸디캡 +${bonus}` : ""}</div></div>
+  <div class="card center">${oppDone ? `📣 ${esc(opp.name)}에게 "나도 끝!" 알림을 보냈어요.<br>` : `📣 ${esc(opp.name)}에게 "빨리 풀어!" 알림을 보냈어요.<br>`}<b>결과는 오늘 밤 ${HOUR_TXT}에 공개!</b>${saved ? "" : `<br><span style="color:var(--bad)">⚠️ 서버 저장 실패 — 인터넷 연결 후 앱을 다시 열어 주세요</span>`}</div>
+  <div class="card"><h3>📒 오늘의 오답노트</h3>${wl.length ? wl.map(w => wordCard(w)).join("") : `<div class="sub">하나도 안 틀렸어요! 🏅</div>`}</div>
+  <button class="btn" data-act="home">홈으로</button>`;
+  if (!saved) LS.set("duel-unsaved", doc);
+  S.game = null; S.finishView = true;
+  loadAll();
+}
+
+/* ===================== 이벤트 ===================== */
+const ACT = {
+  async pick(d) { S.me = d.p; LS.set("duel-me", d.p); await loadAll(); render(); },
+  tab(d) { S.tab = d.k; S.detail = null; S.switchArm = false; render(); window.scrollTo(0, 0); },
+  detail(d) { S.detail = d.d; render(); window.scrollTo(0, 0); },
+  back() { S.detail = null; render(); },
+  home() { S.game = null; S.finishView = false; S.tab = "home"; S.detail = null; render(); maybeCelebrate(); },
+  start() { startGame(false); },
+  resume() { startGame(true); },
+  ready() { countdown(); },
+  next() { nextQ(); },
+  say(d) { speak(d.w); },
+  sayq() { const g = S.game; speak(g.qs[g.idx].w); },
+  ox(d) { const g = S.game, q = g.qs[g.idx]; if (g.locked) return; answer((d.v === "1") === q.truth); },
+  opt(d, el) { const g = S.game, q = g.qs[g.idx]; if (g.locked) return; const ok = q.opts[+d.i] === q.ans; el.classList.add(ok ? "good" : "badc"); if (!ok) document.querySelectorAll(".opt").forEach((b, i) => { if (q.opts[i] === q.ans) b.classList.add("good"); }); answer(ok); },
+  pz(d) { pzTap(+d.i); },
+  pzundo() { const g = S.game; if (g.locked || !g.pz.length) return; g.pz.pop(); drawPuzzle(); },
+  mL(d, el) { matchTap("L", d.w, el); },
+  mR(d, el) { matchTap("R", d.w, el); },
+  kb(d) { kbKey(d.k); },
+  kbDel() { const g = S.game; if (g.locked) return; g.kb = g.kb.slice(0, -1); drawKb(); },
+  kbGo() { kbGo(); },
+  switch() { if (!S.switchArm) { S.switchArm = true; render(); return; } S.switchArm = false; S.me = other(S.me); LS.set("duel-me", S.me); render(); toast(`이제 ${P(S.me).emoji} ${P(S.me).name}(으)로 플레이해요`); },
+  async lvl(d) {
+    const st = Object.assign({}, S.settings, { level: +d.v });
+    try { await DB.set("meta/settings", st); S.settings = st; toast(`난이도 ${d.v}단계로 바꿨어요`); } catch (e) { toast("저장 실패: " + e.message); }
+    render();
+  },
+  sound() { LS.set("duel-sound", !LS.get("duel-sound", true)); render(); },
+  async saveSet() {
+    const st = Object.assign({}, S.settings, { dailyPrize: document.getElementById("pz-d").value.trim(), weeklyPrize: document.getElementById("pz-w").value.trim(), monthlyPrize: document.getElementById("pz-m").value.trim(), bonus: { dad: Math.max(0, +document.getElementById("bn-dad").value || 0), son: Math.max(0, +document.getElementById("bn-son").value || 0) } });
+    try { await DB.set("meta/settings", st); S.settings = st; toast("저장했어요 ✅"); } catch (e) { toast("저장 실패: " + e.message); }
+    render();
+  },
+  testPush() { notify([S.me], "🔔 테스트 알림", "알림이 잘 와요! 오늘도 영어 대결 화이팅 💪", { tags: ["bell"] }); toast("보냈어요. 몇 초 안에 알림이 와야 해요."); },
+  revealNow() { LS.set("duel-reveal-now", !LS.get("duel-reveal-now", false)); render(); },
+  async fakeOpp() { const d = todayKey(), p = other(S.me); const correct = 7 + Math.floor(Math.random() * 6); await DB.set(resPath(d, p), fakeDoc(d, p, correct)); await loadAll(); render(); toast(`${P(p).name} 기록을 만들었어요`); },
+  async resetToday() { const d = todayKey(); await DB.del(resPath(d, S.me)); LS.del(progKey(d)); await loadAll(); render(); toast("오늘 내 기록을 지웠어요"); },
+  async fakeWeek() { const d = todayKey(); for (let i = 1; i <= 14; i++) { const k = dateAdd(d, -i); for (const p of PIDS) if (Math.random() < 0.92) await DB.set(resPath(k, p), fakeDoc(k, p, 6 + Math.floor(Math.random() * 7))); } await loadAll(); render(); toast("지난 2주 기록을 만들었어요"); }
+};
+function fakeDoc(d, p, correct) {
+  const words = shuffle(ORDER, rng(d + p)).slice(0, 12 - correct);
+  const score = correct * 130 + Math.floor(Math.random() * 200);
+  return { player: p, date: d, status: "done", score, bonus: 0, correct, total: 12, timeMs: 60000 + Math.floor(Math.random() * 90000), maxCombo: Math.min(correct, 5), answers: [], wrongWords: words, finishedAt: now(), fake: true };
+}
+document.addEventListener("click", e => { const t = e.target.closest("[data-act]"); if (!t || t.disabled) return; const f = ACT[t.dataset.act]; if (f) f(t.dataset, t); });
+
+/* 앱을 벗어나면 그 문제는 오답 */
+document.addEventListener("visibilitychange", async () => {
+  const g = S.game;
+  if (document.hidden) { if (g && g.phase === "q" && !g.locked) answer(false, { left: true }); return; }
+  if (!g && !S.finishView && S.tab !== "set") { await loadAll(); render(); maybeCelebrate(); }
+});
+
+/* 홈 화면 카운트다운 + 주기적 새로고침 */
+setInterval(() => { const el = document.getElementById("cd"); if (el && !S.game) { const left = revealAt(todayKey()) - now(); if (left <= 0) { loadAll().then(() => { render(); maybeCelebrate(); }); } else el.textContent = fmtDur(left); } }, 1000);
+setInterval(() => { if (!S.game && !S.finishView && S.tab !== "set" && !document.hidden && S.me) loadAll().then(() => { if (!S.game) { const y = window.scrollY; render(); window.scrollTo(0, y); } }); }, 45000);
+
+/* 저장 못한 기록 재전송 */
+async function flushUnsaved() { const u = LS.get("duel-unsaved", null); if (!u) return; try { await DB.set(resPath(u.date, u.player), u); LS.del("duel-unsaved"); } catch (e) {} }
+
+/* 결과 발표 순간 축하 */
+let celebrated = LS.get("duel-celebrated", "");
+function maybeCelebrate() { const d = todayKey(); if (celebrated === d || !isRevealed(d)) return; const o = outcome(d); if (o.none) return; celebrated = d; LS.set("duel-celebrated", d); if (o.winner === S.me) { confetti(60); SFX.win(); toast("👑 오늘은 내가 이겼다!"); } else if (o.winner === "draw") toast("🤝 오늘은 무승부!"); else toast(`${P(o.winner).emoji} 오늘은 ${josa(P(o.winner).name, "이", "가")} 이겼어요. 내일 설욕전!`); }
+
+(async function init() {
+  if ("serviceWorker" in navigator && location.protocol === "https:") { try { navigator.serviceWorker.register("sw.js").catch(() => {}); } catch (e) {} }
+  if (!S.me) return renderPick();
+  app.innerHTML = `<div class="center" style="padding-top:140px"><div style="font-size:60px">⚔️</div><div class="sub">불러오는 중...</div></div>`;
+  await flushUnsaved(); await loadAll(); render(); maybeCelebrate();
+})();
+</script>
+</body>
+</html>
