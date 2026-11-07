@@ -136,8 +136,8 @@ const CONFIG = {
   ntfyTopics: { dad: "duel-f3316aab-dad", son: "duel-f3316aab-son" },
   appUrl: "",                    // 알림을 눌렀을 때 열 주소(비우면 현재 주소)
   players: {
-    dad: { name: "아빠", emoji: "🦁" },
-    son: { name: "아들", emoji: "🐯" }
+    dad: { name: "아빠(철민)", emoji: "🦁" },
+    son: { name: "아들(시현)", emoji: "🐯" }
   },
   resultHour: 22,                // 결과 발표 시각(한국 시간)
   startDate: "2026-11-08",       // 단어 진도 1일차
@@ -1161,7 +1161,7 @@ const PIDS = ["dad", "son"];
 const other = p => p === "dad" ? "son" : "dad";
 const P = id => CONFIG.players[id];
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const josa = (w, a, b) => { const c = w.charCodeAt(w.length - 1); return (c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28) ? w + a : w + b; };
+const josa = (w, a, b) => { const base = w.replace(/\s*\([^)]*\)\s*$/, "") || w; const c = base.charCodeAt(base.length - 1); return (c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28) ? w + a : w + b; };
 const MEM = {};
 const LS = {
   get(k, d) { try { const v = localStorage.getItem(k); return v == null ? (k in MEM ? MEM[k] : d) : JSON.parse(v); } catch (e) { return k in MEM ? MEM[k] : d; } },
@@ -1534,27 +1534,36 @@ function wordCard(w, tag = "") {
   const s = esc(t.s).replace(new RegExp("\\b(" + w + ")\\b", "i"), "<b>$1</b>");
   return `<div class="wcard"><div><div class="w">${esc(w)}${tag ? `<span class="tag ${tag === "복습" ? "rv" : ""}">${tag}</span>` : ""}</div><div class="m">${esc(t.m)}</div><div class="s">${s}</div></div><button class="spk" data-act="say" data-w="${esc(w)}">🔊</button></div>`;
 }
+const ADMIN = "dad";                       // 설정을 바꿀 수 있는 사람
+const isAdmin = () => S.me === ADMIN;
 function viewSet() {
-  const st = S.settings;
-  return `<h1>⚙️ 설정</h1>
-  <div class="card"><h3>나는</h3><div class="jua" style="font-size:24px">${P(S.me).emoji} ${esc(P(S.me).name)}</div>
-  <button class="btn sec small" data-act="switch">${S.switchArm ? "한 번 더 누르면 바뀌어요" : "플레이어 바꾸기"}</button></div>
-  <div class="card"><h3>🎚️ 난이도 (둘이 같이 적용)</h3>
-  <div class="row" style="gap:6px">${[1, 2, 3, 4, 5].map(n => `<button class="btn ${lvOf(st.level) === n ? "" : "sec"} small" style="margin:4px 0" data-act="lvl" data-v="${n}">${n}</button>`).join("")}</div>
-  <div class="jua" style="font-size:19px;margin-top:6px">${lvOf(st.level)}단계 · ${LEVELS[lvOf(st.level)].name}</div><div class="sub">${LEVELS[lvOf(st.level)].desc}</div>
-  <div class="sub" style="margin-top:8px">💡 오늘 문제가 이미 만들어졌다면(누군가 도전을 시작했다면) <b>내일 문제부터</b> 바뀐 난이도가 적용돼요. 두 사람은 항상 같은 난이도로 겨뤄요.</div></div>
-  <div class="card"><h3>🔊 효과음</h3><button class="btn sec small" data-act="sound">${LS.get("duel-sound", true) ? "켜짐 (누르면 끔)" : "꺼짐 (누르면 켬)"}</button></div>
-  <div class="card"><h3>🎁 상품 (둘이 같이 보여요)</h3>
-  <div class="sub">하루 승자</div><input class="txt" id="pz-d" value="${esc(st.dailyPrize)}">
+  const st = S.settings, adm = isAdmin(), lv = lvOf(st.level);
+  const lock = adm ? "" : `<span class="pill">🔒 ${esc(P(ADMIN).name)}만 바꿀 수 있어요</span>`;
+  const levelBox = adm
+    ? `<div class="row" style="gap:6px">${[1, 2, 3, 4, 5].map(n => `<button class="btn ${lv === n ? "" : "sec"} small" style="margin:4px 0" data-act="lvl" data-v="${n}">${n}</button>`).join("")}</div>`
+    : "";
+  const prizes = adm
+    ? `<div class="sub">하루 승자</div><input class="txt" id="pz-d" value="${esc(st.dailyPrize)}">
   <div class="sub">주간 챔피언</div><input class="txt" id="pz-w" value="${esc(st.weeklyPrize)}">
   <div class="sub">이달의 MVP</div><input class="txt" id="pz-m" value="${esc(st.monthlyPrize)}">
   <h3>⚖️ 핸디캡 (하루 점수에 더해 줄 보너스)</h3>
   <div class="row">${PIDS.map(p => `<div style="flex:1"><div class="sub">${P(p).emoji} ${esc(P(p).name)}</div><input class="txt" id="bn-${p}" type="number" inputmode="numeric" value="${(st.bonus || {})[p] || 0}"></div>`).join("")}</div>
   <div class="sub">한쪽이 계속 지면 보너스 점수로 균형을 맞춰 보세요. (최고 점수는 난이도에 따라 하루 약 2,300~2,700점)</div>
-  <button class="btn small" data-act="saveSet">저장</button></div>
+  <button class="btn small" data-act="saveSet">저장</button>`
+    : `<div class="prize">${esc(st.dailyPrize)}</div><div class="prize">${esc(st.weeklyPrize)}</div><div class="prize">${esc(st.monthlyPrize)}</div>
+  <h3>⚖️ 핸디캡</h3><div class="row between jua" style="font-size:18px">${PIDS.map(p => `<span>${P(p).emoji} +${(st.bonus || {})[p] || 0}점</span>`).join("")}</div>`;
+  const canSwitch = adm || DEMO;
+  return `<h1>⚙️ 설정</h1>${adm ? "" : `<div class="card sub">👀 설정은 ${esc(P(ADMIN).name)}만 바꿀 수 있어요. 여기서는 볼 수만 있어요.</div>`}
+  <div class="card"><h3>나는</h3><div class="jua" style="font-size:24px">${P(S.me).emoji} ${esc(P(S.me).name)}</div>
+  ${canSwitch ? `<button class="btn sec small" data-act="switch">${S.switchArm ? "한 번 더 누르면 바뀌어요" : "플레이어 바꾸기"}</button>` : ""}</div>
+  <div class="card"><h3>🎚️ 난이도 (둘이 같이 적용) ${lock}</h3>${levelBox}
+  <div class="jua" style="font-size:19px;margin-top:6px">${lv}단계 · ${LEVELS[lv].name}</div><div class="sub">${LEVELS[lv].desc}</div>
+  ${adm ? `<div class="sub" style="margin-top:8px">💡 오늘 문제가 이미 만들어졌다면(누군가 도전을 시작했다면) <b>내일 문제부터</b> 바뀐 난이도가 적용돼요. 두 사람은 항상 같은 난이도로 겨뤄요.</div>` : ""}</div>
+  <div class="card"><h3>🔊 효과음 (내 폰만)</h3><button class="btn sec small" data-act="sound">${LS.get("duel-sound", true) ? "켜짐 (누르면 끔)" : "꺼짐 (누르면 켬)"}</button></div>
+  <div class="card"><h3>🎁 상품 ${lock}</h3>${prizes}</div>
   <div class="card"><h3>📡 연결 상태</h3><div class="sub">${DEMO ? "체험 모드 (서버 없음)" : "서버 연결: Firebase · 방 " + esc(CONFIG.room)}<br>알림: ${CONFIG.ntfyTopics[S.me] ? "ntfy 토픽 " + esc(CONFIG.ntfyTopics[S.me]) : "설정 안 됨"}</div>
   ${!DEMO && CONFIG.ntfyTopics[S.me] ? `<button class="btn sec small" data-act="testPush">내 폰에 테스트 알림 보내기</button>` : ""}</div>
-  ${DEMO_OR_TEST() ? `<div class="card"><h3>🧪 테스트 도구</h3>
+  ${DEMO_OR_TEST() && (adm || DEMO) ? `<div class="card"><h3>🧪 테스트 도구</h3>
   <button class="btn sec small" data-act="revealNow">${LS.get("duel-reveal-now", false) ? "✅ 결과 바로 공개 중 (누르면 끔)" : "결과 바로 공개하기 (10시 안 기다림)"}</button>
   <button class="btn sec small" data-act="fakeOpp">상대 기록 가짜로 만들기 (오늘)</button>
   <button class="btn sec small" data-act="resetToday">오늘 내 기록 지우기</button>
@@ -1818,23 +1827,25 @@ const ACT = {
   kb(d) { kbKey(d.k); },
   kbDel() { const g = S.game; if (g.locked) return; g.kb = g.kb.slice(0, -1); drawKb(); },
   kbGo() { kbGo(); },
-  switch() { if (!S.switchArm) { S.switchArm = true; render(); return; } S.switchArm = false; S.me = other(S.me); LS.set("duel-me", S.me); render(); toast(`이제 ${P(S.me).emoji} ${P(S.me).name}(으)로 플레이해요`); },
+  switch() { if (!isAdmin() && !DEMO) return; if (!S.switchArm) { S.switchArm = true; render(); return; } S.switchArm = false; S.me = other(S.me); LS.set("duel-me", S.me); render(); toast(`이제 ${P(S.me).emoji} ${P(S.me).name}(으)로 플레이해요`); },
   async lvl(d) {
+    if (!isAdmin()) return toast("설정은 아빠만 바꿀 수 있어요");
     const st = Object.assign({}, S.settings, { level: +d.v });
     try { await DB.set("meta/settings", st); S.settings = st; toast(`난이도 ${d.v}단계로 바꿨어요`); } catch (e) { toast("저장 실패: " + e.message); }
     render();
   },
   sound() { LS.set("duel-sound", !LS.get("duel-sound", true)); render(); },
   async saveSet() {
+    if (!isAdmin()) return toast("설정은 아빠만 바꿀 수 있어요");
     const st = Object.assign({}, S.settings, { dailyPrize: document.getElementById("pz-d").value.trim(), weeklyPrize: document.getElementById("pz-w").value.trim(), monthlyPrize: document.getElementById("pz-m").value.trim(), bonus: { dad: Math.max(0, +document.getElementById("bn-dad").value || 0), son: Math.max(0, +document.getElementById("bn-son").value || 0) } });
     try { await DB.set("meta/settings", st); S.settings = st; toast("저장했어요 ✅"); } catch (e) { toast("저장 실패: " + e.message); }
     render();
   },
   testPush() { notify([S.me], "🔔 테스트 알림", "알림이 잘 와요! 오늘도 영어 대결 화이팅 💪", { tags: ["bell"] }); toast("보냈어요. 몇 초 안에 알림이 와야 해요."); },
   revealNow() { LS.set("duel-reveal-now", !LS.get("duel-reveal-now", false)); render(); },
-  async fakeOpp() { const d = todayKey(), p = other(S.me); const correct = 7 + Math.floor(Math.random() * 6); await DB.set(resPath(d, p), fakeDoc(d, p, correct)); await loadAll(); render(); toast(`${P(p).name} 기록을 만들었어요`); },
-  async resetToday() { const d = todayKey(); await DB.del(resPath(d, S.me)); LS.del(progKey(d)); await loadAll(); render(); toast("오늘 내 기록을 지웠어요"); },
-  async fakeWeek() { const d = todayKey(); for (let i = 1; i <= 14; i++) { const k = dateAdd(d, -i); for (const p of PIDS) if (Math.random() < 0.92) await DB.set(resPath(k, p), fakeDoc(k, p, 6 + Math.floor(Math.random() * 7))); } await loadAll(); render(); toast("지난 2주 기록을 만들었어요"); }
+  async fakeOpp() { if (!isAdmin() && !DEMO) return; const d = todayKey(), p = other(S.me); const correct = 7 + Math.floor(Math.random() * 6); await DB.set(resPath(d, p), fakeDoc(d, p, correct)); await loadAll(); render(); toast(`${P(p).name} 기록을 만들었어요`); },
+  async resetToday() { if (!isAdmin() && !DEMO) return; const d = todayKey(); await DB.del(resPath(d, S.me)); LS.del(progKey(d)); await loadAll(); render(); toast("오늘 내 기록을 지웠어요"); },
+  async fakeWeek() { if (!isAdmin() && !DEMO) return; const d = todayKey(); for (let i = 1; i <= 14; i++) { const k = dateAdd(d, -i); for (const p of PIDS) if (Math.random() < 0.92) await DB.set(resPath(k, p), fakeDoc(k, p, 6 + Math.floor(Math.random() * 7))); } await loadAll(); render(); toast("지난 2주 기록을 만들었어요"); }
 };
 function fakeDoc(d, p, correct) {
   const words = shuffle(ORDER, rng(d + p)).slice(0, 12 - correct);
