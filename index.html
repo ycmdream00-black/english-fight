@@ -13,7 +13,7 @@
 <style>
 :root{
   --bg:#14123a; --bg2:#1f1c52; --card:#2a2669; --card2:#352f80; --line:#4a43a3;
-  --txt:#f4f2ff; --sub:#b9b3ea; --dad:#4fc3ff; --son:#ffb340;
+  --txt:#f4f2ff; --sub:#b9b3ea; --dad:#4fc3ff; --mom:#ff7eb6; --son:#ffb340;
   --ok:#3ddc84; --bad:#ff5c7a; --gold:#ffd54a; --accent:#a67bff;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -41,7 +41,12 @@ h3{font-size:18px;margin:12px 0 6px}
 .tabs button.on{color:var(--gold)}
 .vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px}
 .pl{background:var(--bg2);border-radius:16px;padding:12px 6px;text-align:center;border:3px solid transparent}
-.pl.dad{border-color:var(--dad)} .pl.son{border-color:var(--son)}
+.pl.dad{border-color:var(--dad)} .pl.mom{border-color:var(--mom)} .pl.son{border-color:var(--son)}
+.vs3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.vs3 .pl{padding:10px 4px}.vs3 .pl .emo{font-size:34px}.vs3 .pl .nm{font-size:15px}.vs3 .pl .sc{font-size:21px}.vs3 .pl .st{font-size:12px}
+.rank{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;margin-top:8px}
+.rank .nm{font-family:"Jua";font-size:17px;white-space:nowrap}.rank .w{font-family:"Jua";font-size:18px;text-align:right;white-space:nowrap}
+.rank .bar{height:10px;border-radius:99px;background:#0e0c2b;overflow:hidden}.rank .bar>div{height:100%;border-radius:99px}
 .pl .emo{font-size:42px;line-height:1.1}
 .pl .nm{font-family:"Jua";font-size:19px}
 .pl .st{font-size:13px;color:var(--sub);margin-top:4px}
@@ -133,10 +138,11 @@ const CONFIG = {
   room: "duel-f3316aab",       // 우리 가족 방 이름(남이 못 맞히게 아무 글자나 길게)
   // 푸시 알림(ntfy 앱). 각자 폰에서 자기 토픽을 구독합니다. 비워두면 알림을 보내지 않습니다.
   ntfyServer: "https://ntfy.sh",
-  ntfyTopics: { dad: "duel-f3316aab-dad", son: "duel-f3316aab-son" },
+  ntfyTopics: { dad: "duel-f3316aab-dad", mom: "duel-f3316aab-mom", son: "duel-f3316aab-son" },
   appUrl: "",                    // 알림을 눌렀을 때 열 주소(비우면 현재 주소)
   players: {
     dad: { name: "아빠(철민)", emoji: "🦁" },
+    mom: { name: "엄마(선진)", emoji: "🐰" },
     son: { name: "아들(시현)", emoji: "🐯" }
   },
   resultHour: 22,                // 결과 발표 시각(한국 시간)
@@ -146,7 +152,7 @@ const CONFIG = {
   startDate: "2026-11-08",       // 단어 진도 1일차
   newWordsPerDay: 8,
   reviewWordsPerDay: 4,
-  defaultLevel: 3,               // 기본 난이도(1~5). 앱 설정에서 바꿀 수 있어요
+  defaultLevel: 4,               // 기본 난이도(1~5). 4 = 중2~고1. 앱 설정에서 바꿀 수 있어요
   studySeconds: 90,              // 외우기 시간
   testTools: false               // true면 서버 모드에서도 '테스트 도구'가 보입니다
 };
@@ -442,7 +448,7 @@ journey|여정|It was a long journey.
 joy|기쁨|She jumped with joy.
 judge|심사위원|The judge gave him a high score.
 jump|뛰어오르다|Can you jump high?
-keep|유지하다|Keep the door open.
+keep|~한 상태로 두다|Keep the door open.
 key|열쇠|I lost my key.
 kick|차다|Kick the ball hard.
 kind|친절한|She is kind to everyone.
@@ -1157,11 +1163,413 @@ volume|음량|Turn down the volume.
 waterfall|폭포|The waterfall is beautiful.
 weird|기묘한|That's weird!
 wildlife|야생 동물|We must protect wildlife.`;
+/* 고1 수준 단어 (난이도 4 이상) */
+const WORDS_HS_RAW = `abandon|버리다|They had to abandon the ship.
+abstract|추상적인|This painting is too abstract for me.
+abundant|풍부한|Fish are abundant in this lake.
+academic|학업의|Her academic record is excellent.
+accelerate|가속하다|The car began to accelerate.
+access|접근|Students have access to the library.
+accommodate|수용하다|The hotel can accommodate 500 guests.
+accompany|동행하다|I will accompany you to the station.
+accomplish|완수하다|We can accomplish this task together.
+account|계좌|I opened a bank account.
+accumulate|축적하다|Dust will accumulate on the shelf.
+accuse|비난하다, 고발하다|They accuse him of lying.
+acknowledge|인정하다|He refused to acknowledge his mistake.
+acquire|습득하다|Children acquire language quickly.
+adequate|적당한|We need adequate sleep.
+adjust|조정하다|Adjust the volume of the TV.
+adolescent|청소년|Every adolescent needs support.
+adopt|입양하다|They decided to adopt a puppy.
+aggressive|공격적인|The dog became aggressive.
+agriculture|농업|Agriculture is important to our economy.
+aid|원조|They sent aid to the victims.
+aim|겨냥하다|Aim at the center.
+alter|변경하다|We had to alter our plans.
+alternative|대안|We need an alternative plan.
+ambition|야망|He has a strong ambition.
+analyze|분석하다|Scientists analyze the data.
+anticipate|예상하다|We anticipate a big crowd.
+appeal|호소하다|They appeal to the public for help.
+appetite|식욕|I have no appetite today.
+appliance|가전제품|A microwave is a useful appliance.
+appoint|임명하다|They will appoint a new coach.
+approve|승인하다|The teacher will approve your plan.
+approximately|대략|It takes approximately two hours.
+aspect|측면|Consider every aspect of the problem.
+assemble|조립하다|Assemble the toy using the guide.
+assess|평가하다|Teachers assess students' progress.
+asset|자산|Good health is a great asset.
+assign|배정하다|The teacher will assign homework.
+assist|돕다|Can you assist me with this?
+associate|연관 짓다|We associate summer with the beach.
+assume|가정하다|Don't assume he is guilty.
+assure|장담하다|I assure you it's safe.
+attitude|태도|He has a positive attitude.
+authority|권한|She has the authority to decide.
+automatic|자동의|This door is automatic.
+awkward|어색한|There was an awkward silence.
+bargain|싸게 산 물건|This jacket was a bargain.
+barrier|장벽|Language can be a barrier.
+bias|편견|Try to judge without bias.
+bond|유대|There is a strong bond between them.
+boundary|경계|The river forms a natural boundary.
+breakthrough|돌파구|Scientists made a breakthrough.
+broadcast|방송하다|They broadcast the game live.
+calculate|계산하다|Calculate the total cost.
+candidate|후보자|She is a strong candidate.
+capacity|수용력|The stadium has a capacity of 50,000.
+cease|그치다|The rain will cease soon.
+chaos|혼돈|The room was in chaos.
+circumstance|사정|Under no circumstance should you give up.
+cite|인용하다|Cite the source of your data.
+civil|시민의|Civil rights are important.
+clarify|명확히 하다|Can you clarify your point?
+collapse|붕괴하다|The old bridge may collapse.
+combine|결합하다|Combine the eggs and flour.
+commit|저지르다|He did not commit the crime.
+compensate|배상하다|They will compensate you for the damage.
+complex|복잡한|This is a complex problem.
+component|구성 요소|Each component is important.
+conceal|감추다|He tried to conceal the truth.
+concept|개념|This concept is hard to explain.
+conclude|결론을 내리다|We can conclude that he is right.
+conduct|수행하다|They conduct experiments every day.
+conflict|갈등|They solved the conflict peacefully.
+conscious|의식하는|He was conscious of the danger.
+consequence|대가|You must accept the consequence.
+conserve|아끼다|We must conserve energy.
+considerable|상당한|It costs a considerable amount.
+constant|끊임없는|The constant noise bothered me.
+construct|건설하다|They will construct a new bridge.
+consult|상담하다|You should consult a doctor.
+consume|소모하다|Cars consume a lot of fuel.
+contemporary|동시대의|She is a contemporary artist.
+context|문맥|Guess the meaning from the context.
+contrast|대조|There is a sharp contrast between them.
+contribute|기여하다|Everyone can contribute to the team.
+controversy|논란|The decision caused controversy.
+convert|전환하다|Convert the file to PDF.
+convince|확신시키다|I tried to convince him.
+cope|대처하다|How do you cope with stress?
+core|핵심|This is the core of the problem.
+corporation|기업|He works for a large corporation.
+crisis|위기|The country faced an economic crisis.
+critical|비판적인|Think in a critical way.
+crucial|결정적인|This is a crucial moment.
+cultivate|재배하다|Farmers cultivate rice.
+cure|치료법|There is no cure for this disease yet.
+currency|통화(돈)|The won is the currency of Korea.
+curriculum|교육 과정|Coding is part of the curriculum.
+decade|10년|He lived there for a decade.
+decline|쇠퇴하다|The town began to decline.
+dedicate|바치다|She will dedicate her life to music.
+defeat|패배시키다|We can defeat them.
+define|정의하다|How do you define success?
+deliberately|일부러|He broke it deliberately.
+democracy|민주주의|Korea is a democracy.
+demonstrate|시연하다|He will demonstrate how it works.
+deny|부인하다|Do you deny it?
+deposit|예금하다|I deposit money every month.
+deserve|~을 받을 만하다|You deserve a rest.
+desire|욕구|He has a desire to travel.
+despite|~에도 불구하고|We played despite the rain.
+detect|감지하다|This device can detect smoke.
+determine|알아내다|We need to determine the cause.
+devote|헌신하다|He will devote himself to his work.
+dialect|사투리|My grandma speaks a strong dialect.
+dimension|차원|Think in a new dimension.
+discipline|규율|The team needs discipline.
+discrimination|차별|We must fight discrimination.
+distinguish|구별하다|Can you distinguish the twins?
+distribute|분배하다|They distribute food to the poor.
+dominate|지배하다|The team will dominate the game.
+draft|초안|This is the first draft.
+drought|가뭄|The drought lasted for months.
+dynamic|역동적인|Seoul is a dynamic city.
+efficient|효율적인|This is an efficient method.
+eliminate|없애다|Eliminate the errors.
+embrace|포옹하다|She ran to embrace her mother.
+emerge|부상하다|New leaders will emerge.
+emphasize|강조하다|I want to emphasize this point.
+enormous|막대한|They spent an enormous amount.
+ensure|보장하다|We must ensure your safety.
+entertain|즐겁게 하다|The clown will entertain the kids.
+enthusiasm|열의|She has great enthusiasm for science.
+equipment|장비|Bring your camping equipment.
+era|시대|We live in the digital era.
+essential|필수적인|Water is essential for life.
+evolve|진화하다|Animals evolve over time.
+exaggerate|과장하다|Don't exaggerate the story.
+exceed|초과하다|Don't exceed the speed limit.
+exclude|제외하다|Don't exclude anyone from the game.
+expand|확장하다|They plan to expand the store.
+expense|비용|The trip was a big expense.
+explode|폭발하다|The balloon may explode.
+explore|탐험하다|Let's explore the cave.
+expose|노출시키다|Don't expose your skin to the sun too long.
+extend|연장하다|Can we extend the deadline?
+extinct|멸종된|Dinosaurs are extinct.
+extreme|극도의|The heat was extreme.
+facility|시설|The facility is open to the public.
+factor|요인|Price is an important factor.
+faith|신념|Have faith in yourself.
+fatal|치명적인|The mistake was fatal.
+flaw|결함|There is a flaw in the plan.
+flourish|번창하다|The business began to flourish.
+fluent|유창한|She is fluent in English.
+forbid|못 하게 하다|My parents forbid me to stay out late.
+formal|격식을 차린|Wear formal clothes to the wedding.
+foundation|토대|Reading is the foundation of learning.
+fragile|깨지기 쉬운|This glass is fragile.
+frustrate|좌절시키다|The long wait may frustrate you.
+fundamental|근본적인|This is a fundamental problem.
+generate|생성하다|Wind can generate electricity.
+genuine|진심 어린|She showed genuine interest.
+grateful|고마워하는|I am grateful for your help.
+grave|무덤|They visited his grave.
+guarantee|보증하다|We guarantee the quality.
+handle|다루다|Can you handle this problem?
+hardship|고난|He faced great hardship.
+hazard|위험 요소|Smoking is a health hazard.
+heritage|유산|Hanbok is part of our heritage.
+hostile|적대적인|They were hostile to strangers.
+humble|겸손한|He is humble despite his success.
+hypothesis|가설|Test your hypothesis.
+identical|동일한|The twins look identical.
+identify|확인하다|Can you identify this bird?
+ideal|이상적인|This is the ideal place for a picnic.
+illustrate|삽화를 넣다|She will illustrate the book.
+imitate|흉내 내다|Parrots can imitate human speech.
+impact|충격|The impact broke the glass.
+imply|암시하다|What does his smile imply?
+impose|부과하다|They impose a tax on sugar.
+incident|사건|The incident happened last night.
+income|수입|His income is not high.
+indicate|나타내다|What does this sign indicate?
+individual|개인|Every individual is important.
+inevitable|불가피한|Change is inevitable.
+infant|유아|The infant is sleeping.
+infer|추론하다|What can you infer from the story?
+inherit|물려받다|He will inherit the house.
+initial|처음의|My initial plan failed.
+innocent|무죄인|He is innocent.
+innovation|혁신|Innovation drives progress.
+insight|통찰력|Her insight was impressive.
+inspect|점검하다|They inspect the cars every year.
+install|설치하다|Install the app on your phone.
+instinct|본능|Birds fly south by instinct.
+institution|기관|A school is an educational institution.
+intense|강렬한|The heat was intense.
+interact|상호 작용하다|Children interact with each other.
+interfere|간섭하다|Don't interfere in my business.
+interpret|해석하다|How do you interpret this poem?
+interrupt|방해하다|Don't interrupt me while I'm talking.
+invade|침략하다|The army tried to invade the country.
+invest|투자하다|Invest your time in learning.
+involve|관련시키다|The game will involve all students.
+isolate|고립시키다|The storm will isolate the village.
+justify|정당화하다|You can't justify cheating.
+labor|노동|The work requires hard labor.
+landscape|풍경|The landscape is beautiful.
+launch|출시하다|They will launch a new phone.
+legal|합법적인|Is it legal to park here?
+legend|전설|It is just a legend.
+liberty|자유|They fought for liberty.
+literal|문자 그대로의|That is the literal meaning.
+logical|논리적인|Give a logical answer.
+maintain|유지하다|Maintain a healthy lifestyle.
+majority|대다수|The majority of students agreed.
+manufacture|제조하다|They manufacture cars.
+merchant|상인|The merchant sold silk.
+migrate|이동하다(철새)|Birds migrate south in winter.
+minimum|최소|The minimum age is 12.
+minor|사소한|It's just a minor problem.
+modify|수정하다|You can modify the design.
+monitor|감시하다|We monitor the weather.
+motive|동기|What was his motive?
+multiple|다수의|There are multiple answers.
+myth|신화|Greek myth is fascinating.
+negotiate|협상하다|They will negotiate a deal.
+neutral|중립적인|Switzerland is a neutral country.
+nevertheless|그럼에도 불구하고|It was raining. Nevertheless, we went out.
+numerous|수많은|There are numerous stars in the sky.
+obey|복종하다|Dogs obey their owners.
+objective|객관적인|Try to be objective.
+obstacle|장애물|He overcame every obstacle.
+obtain|획득하다|You must obtain permission.
+occupy|차지하다|The table will occupy too much space.
+odd|홀수의|Three is an odd number.
+offend|기분을 상하게 하다|I didn't mean to offend you.
+opponent|상대|He beat his opponent easily.
+oppose|반대하다|Many people oppose the plan.
+optimistic|낙관적인|Stay optimistic.
+outcome|성과|We are happy with the outcome.
+overall|전반적인|The overall result was good.
+overlook|간과하다|Don't overlook small details.
+overwhelm|압도하다|The work may overwhelm you.
+panic|당황하다|Don't panic!
+parallel|평행한|Draw two parallel lines.
+passion|열정|Follow your passion.
+penalty|벌칙|He got a penalty for being late.
+perceive|인식하다|How do you perceive the problem?
+perspective|관점|Look at it from a different perspective.
+phenomenon|현상|A rainbow is a natural phenomenon.
+philosophy|철학|He studied philosophy.
+pledge|서약|They made a pledge to help.
+policy|정책|The new policy starts today.
+portion|1인분|This portion is too big.
+pose|자세를 취하다|Pose for the photo.
+potential|잠재력|She has great potential.
+precise|정밀한|We need precise measurements.
+preserve|보존하다|We must preserve our forests.
+primary|초등의|He goes to primary school.
+principle|원리|Learn the basic principle.
+prior|사전의|No prior experience is needed.
+privilege|특권|Education is a privilege.
+probability|확률|The probability of rain is high.
+proceed|진행하다|Please proceed to gate 5.
+profession|전문직|Teaching is a noble profession.
+prohibit|금지하다|They prohibit smoking here.
+prominent|저명한|He is a prominent scientist.
+prompt|즉각적인|Thank you for your prompt reply.
+proportion|비율|The proportion of girls is high.
+prospect|전망|The prospect for the future is bright.
+prosper|번영하다|The town began to prosper.
+psychology|심리학|She studies psychology.
+punctual|시간을 지키는|Be punctual for class.
+pursue|추구하다|Pursue your dreams.
+radical|급진적인|They made radical changes.
+random|무작위의|Pick a random number.
+rational|이성적인|Make a rational decision.
+raw|날것의|Don't eat raw meat.
+reckless|무모한|He is a reckless driver.
+refer|참조하다|Refer to the dictionary.
+reform|개혁|The school needs reform.
+regard|여기다|I regard him as a friend.
+regulate|규제하다|The government will regulate prices.
+reinforce|강화하다|We must reinforce the wall.
+reject|거부하다|They will reject the offer.
+relevant|관련 있는|This information is not relevant.
+reluctant|꺼리는|He was reluctant to help.
+remarkable|주목할 만한|She made remarkable progress.
+remedy|치료약|Rest is the best remedy.
+remote|외딴|They live in a remote village.
+renew|갱신하다|I need to renew my passport.
+reproduce|번식하다|Bacteria reproduce quickly.
+residence|거주지|This is his official residence.
+resign|사임하다|He decided to resign.
+resist|저항하다|I couldn't resist the cake.
+resolve|해결하다|Let's resolve the problem.
+restore|복원하다|They will restore the old palace.
+restrict|제한하다|They restrict access to the area.
+retain|보유하다|Try to retain what you learned.
+reverse|뒤집다|Reverse the order of the cards.
+revise|개정하다|Revise your essay.
+revolution|혁명|The industrial revolution changed the world.
+rigid|경직된|The rules are too rigid.
+rural|시골의|They live in a rural area.
+scarce|부족한|Water is scarce in the desert.
+scatter|흩뿌리다|Scatter the seeds on the soil.
+secure|확보하다|We must secure enough water.
+seize|붙잡다|Seize the chance!
+shift|교대 근무|He works the night shift.
+skeptical|회의적인|I am skeptical about the plan.
+sole|유일한|He is the sole survivor.
+solid|고체|Ice is a solid.
+sophisticated|정교한|This is a sophisticated machine.
+spontaneous|즉흥적인|It was a spontaneous decision.
+stable|안정된|The patient is stable now.
+statistics|통계|Statistics show that crime is falling.
+status|지위|Money is not a sign of status.
+stimulate|자극하다|Music can stimulate the brain.
+substitute|대체하다|You can substitute honey for sugar.
+subtle|미묘한|There is a subtle difference.
+summit|정상(산)|We reached the summit.
+superior|우수한|This product is superior.
+suspect|의심하다|I suspect he is lying.
+sustain|지속하다|We cannot sustain this pace.
+swallow|삼키다|Swallow the pill with water.
+symptom|증상|A fever is a common symptom.
+tackle|씨름하다|Let's tackle this problem together.
+temper|성질|He has a bad temper.
+tend|경향이 있다|I tend to sleep late.
+tension|긴장|There was tension in the room.
+territory|영토|This island is our territory.
+thorough|철저한|Do a thorough check.
+tolerate|참다|I can't tolerate the noise.
+trait|특성|Honesty is a good trait.
+transfer|옮기다|Transfer the files to a USB.
+transparent|투명한|Glass is transparent.
+treaty|조약|The two countries signed a treaty.
+tremendous|엄청난|He made a tremendous effort.
+trigger|유발하다|Stress can trigger headaches.
+ultimate|궁극적인|Our ultimate goal is to win.
+undergo|겪다|The city will undergo big changes.
+utilize|활용하다|Utilize your free time well.
+vague|모호한|His answer was vague.
+valid|유효한|Your ticket is valid for one year.
+vary|서로 다르다|Prices vary from store to store.
+verify|검증하다|Please verify your email.
+vertical|수직의|Draw a vertical line.
+vivid|생생한|I have a vivid memory of that day.
+voluntary|자발적인|The class is voluntary.
+vulnerable|취약한|Old people are vulnerable to the cold.
+welfare|복지|Child welfare is important.
+withdraw|인출하다|I need to withdraw some cash.
+yield|산출하다|The farm will yield a good crop.
+convey|전달하다|Words cannot convey my feelings.
+deceive|속이다|Don't try to deceive me.
+deprive|빼앗다|Don't deprive him of sleep.
+endure|견디다|She had to endure the pain.
+fascinate|매혹하다|Space will fascinate you.
+gratitude|감사하는 마음|I want to express my gratitude.
+ignorant|무지한|He is ignorant of the rules.
+inferior|열등한|This product is inferior.
+irritate|짜증 나게 하다|The noise may irritate you.
+mock|조롱하다|Don't mock others.
+neglect|방치하다|Don't neglect your health.
+ponder|숙고하다|Ponder the question carefully.
+recall|기억해 내다|I can't recall his name.
+scold|꾸짖다|Mom will scold me.
+spoil|망치다|Don't spoil the surprise.
+startle|깜짝 놀라게 하다|The noise will startle the baby.
+stubborn|고집 센|He is very stubborn.
+sympathy|동정|I feel sympathy for him.
+tempt|유혹하다|Don't tempt me!
+thrill|전율|The ride gave me a thrill.
+urge|촉구하다|I urge you to study harder.
+wither|시들다|Flowers wither without water.
+compromise|타협|They reached a compromise.
+consistent|일관된|Be consistent in your effort.
+conventional|관습적인|He has conventional ideas.
+dense|빽빽한|The forest is dense.
+dispute|분쟁|They settled the dispute.
+evident|분명한|It is evident that he is tired.
+fraction|분수(수학)|One half is a fraction.
+friction|마찰|Friction creates heat.
+gravity|중력|Gravity pulls us down.
+horizon|지평선|The sun sank below the horizon.
+molecule|분자|A molecule is tiny.
+orbit|궤도|The moon is in orbit around the earth.
+particle|입자|A particle of dust floated in the air.
+predator|포식자|The lion is a top predator.
+prey|먹이|The eagle caught its prey.
+vapor|증기|Water vapor rises into the sky.
+fossil|화석|They found a dinosaur fossil.
+glacier|빙하|The glacier is melting.
+volcano|화산|The volcano is still active.
+emission|배출|Car emission pollutes the air.
+renewable|재생 가능한|Solar power is renewable energy.
+sustainable|지속 가능한|We need sustainable growth.`;
 
 /* ===================== 기본 유틸 ===================== */
 const DEMO = !CONFIG.firebaseProjectId;
-const PIDS = ["dad", "son"];
-const other = p => p === "dad" ? "son" : "dad";
+const PIDS = Object.keys(CONFIG.players);
+const others = p => PIDS.filter(x => x !== p);
+const COLOR = { dad: "var(--dad)", mom: "var(--mom)", son: "var(--son)" };
+const names = ps => ps.map(p => P(p).name).join(", ");
 const P = id => CONFIG.players[id];
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const josa = (w, a, b) => { const base = w.replace(/\s*\([^)]*\)\s*$/, "") || w; const c = base.charCodeAt(base.length - 1); return (c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28) ? w + a : w + b; };
@@ -1199,11 +1607,14 @@ function shuffle(arr, r) { const a = arr.slice(); for (let i = a.length - 1; i >
 
 /* ----- 단어 ----- */
 const parseW = (raw, adv) => raw.trim().split("\n").map(l => { const [w, m, s] = l.split("|").map(x => x.trim()); return { w, m, s, adv }; });
-const WORDS = parseW(WORDS_RAW, 0).concat(parseW(WORDS_ADV_RAW, 1));
+const WORDS = parseW(WORDS_RAW, 0).concat(parseW(WORDS_ADV_RAW, 1), parseW(WORDS_HS_RAW, 2));
 const WMAP = Object.fromEntries(WORDS.map(x => [x.w, x]));
 const ORDER = shuffle(WORDS.filter(x => !x.adv).map(x => x.w), rng("word-order-v1"));
-const ORDER_ADV = shuffle(WORDS.filter(x => x.adv).map(x => x.w), rng("word-order-adv-v1"));
-const ALL_ORDER = ORDER.concat(ORDER_ADV);
+const ORDER_ADV = shuffle(WORDS.filter(x => x.adv === 1).map(x => x.w), rng("word-order-adv-v1"));
+const ORDER_HS = shuffle(WORDS.filter(x => x.adv === 2).map(x => x.w), rng("word-order-hs-v1"));
+const ALL_ORDER = ORDER.concat(ORDER_ADV, ORDER_HS);
+const BANKS = [ORDER, ORDER_ADV, ORDER_HS];
+const BANK_NAME = ["중1", "중2~3", "고1"];
 function mTokens(m) { return m.replace(/\([^)]*\)/g, "").split(/[,·\/]/).map(t => t.replace(/[~\s]/g, "")).filter(Boolean); }
 function overlap(a, b) { const A = mTokens(a), B = mTokens(b); return A.some(x => B.some(y => x === y || (x.length >= 2 && y.length >= 2 && (x.includes(y) || y.includes(x))))); }
 function blankOut(s, w) { return s.replace(new RegExp("\\b" + w + "\\b", "i"), "_____"); }
@@ -1211,30 +1622,31 @@ function blankOut(s, w) { return s.replace(new RegExp("\\b" + w + "\\b", "i"), "
 /* ===================== 문제 만들기 ===================== */
 /* ===================== 난이도 ===================== */
 const T_BASE = ["ox", "meaning", "listen", "word", "puzzle", "blank", "match", "ox", "listen", "blank", "puzzle", "boss"];
+const T_MID = ["ox", "meaning", "listen", "word", "puzzle", "blank", "match", "boss", "listen", "blank", "puzzle", "boss"];
+const T_HARD = ["meaning", "listen", "word", "puzzle", "blank", "match", "boss", "listen", "blank", "puzzle", "boss", "boss"];
+const T_MAX = ["listen", "word", "boss", "blank", "match", "puzzle", "boss", "listen", "blank", "boss", "puzzle", "boss"];
+/* mix = 새 단어 8개를 [중1, 중2~3, 고1]에서 몇 개씩 */
 const LEVELS = {
-  1: { name: "쉬움", desc: "중1 단어 · 시간 넉넉(+25%)", adv: 0, time: 1.25, study: 100, decoy: 0, types: T_BASE },
-  2: { name: "보통", desc: "중1 단어 · 처음 버전 그대로", adv: 0, time: 1, study: 90, decoy: 0, types: T_BASE },
-  3: { name: "조금 어려움", desc: "새 단어 8개 중 3개가 중2~3 · 시간 15%↓ · 보스 2문제 · 듣고 '뜻' 고르기 · 헷갈리는 보기 · 퍼즐 함정 글자 1개", adv: 3, time: 0.85, study: 90, decoy: 1,
-       types: ["ox", "meaning", "listen", "word", "puzzle", "blank", "match", "boss", "listen", "blank", "puzzle", "boss"] },
-  4: { name: "어려움", desc: "새 단어 6개가 중2~3 · 시간 25%↓ · 보스 3문제 · O/X 없음 · 퍼즐 함정 글자 2개 · 보스 첫 글자 힌트 없음", adv: 6, time: 0.75, study: 80, decoy: 2,
-       types: ["meaning", "listen", "word", "puzzle", "blank", "match", "boss", "listen", "blank", "puzzle", "boss", "boss"] },
-  5: { name: "최강", desc: "새 단어 전부 중2~3 · 시간 35%↓ · 보스 4문제", adv: 8, time: 0.65, study: 70, decoy: 2,
-       types: ["listen", "word", "boss", "blank", "match", "puzzle", "boss", "listen", "blank", "boss", "puzzle", "boss"] }
+  1: { name: "중1", desc: "중1 단어 · 기본 시간 · 쉬운 문제 구성", mix: [8, 0, 0], time: 1, study: 90, decoy: 0, types: T_BASE },
+  2: { name: "중1~중3", desc: "중1 5개 + 중2~3 3개 · 시간 15%↓ · 보스 2문제 · 듣고 '뜻' 고르기 · 퍼즐 함정 글자 1개", mix: [5, 3, 0], time: 0.85, study: 90, decoy: 1, types: T_MID },
+  3: { name: "중2~중3", desc: "중2~3 단어만 · 시간 20%↓ · 보스 2문제 · 퍼즐 함정 글자 1개", mix: [0, 8, 0], time: 0.8, study: 85, decoy: 1, types: T_MID },
+  4: { name: "중2~고1", desc: "중2~3 4개 + 고1 4개 · 시간 20%↓ · 보스 3문제 · O/X 없음 · 함정 글자 2개 · 보스 첫 글자 힌트 없음", mix: [0, 4, 4], time: 0.8, study: 80, decoy: 2, types: T_HARD },
+  5: { name: "고1", desc: "고1 단어만 · 시간 30%↓ · 보스 4문제", mix: [0, 0, 8], time: 0.7, study: 70, decoy: 2, types: T_MAX }
 };
+const LV_SCHEME = 2;
+const OLD_LV = { 1: 1, 2: 1, 3: 2, 4: 3, 5: 3 };   // 예전 난이도 번호 → 새 번호
 const lvOf = x => LEVELS[x] ? +x : 2;
 const TYPE_LABEL = { ox: "⚡ 스피드 O/X", meaning: "🧠 뜻 고르기", word: "🔤 단어 고르기", listen: "🎧 듣고 고르기", puzzle: "🧩 철자 퍼즐", blank: "📝 빈칸 채우기", match: "🔗 짝 맞추기", boss: "👾 보스 (점수 2배)" };
 
 function dayWords(date, review, lv) {
   const L = LEVELS[lv];
-  const r = rng("day|" + date + "|" + CONFIG.room + "|" + lv);
-  const N = ORDER.length, NA = ORDER_ADV.length, n = CONFIG.newWordsPerDay, k = Math.min(n, L.adv);
+  const r = rng("day|" + date + "|" + CONFIG.room + "|" + lv + "|s" + LV_SCHEME);
+  const n = CONFIG.newWordsPerDay;
   const di = Math.max(0, dayDiff(CONFIG.startDate, date));
   const fresh = [];
-  for (let i = 0; i < n - k; i++) fresh.push(ORDER[(di * n + i) % N]);
-  for (let i = 0; i < k; i++) fresh.push(ORDER_ADV[(di * n + i) % NA]);
+  L.mix.forEach((cnt, b) => { const B = BANKS[b]; for (let i = 0; i < cnt; i++) fresh.push(B[(di * n + i) % B.length]); });
   let rv = shuffle([...new Set(review || [])].filter(w => WMAP[w] && !fresh.includes(w)).sort(), r).slice(0, CONFIG.reviewWordsPerDay);
-  const learned = Math.min(di * n, N);
-  const learnedPool = (learned >= 8 ? ORDER.slice(0, learned) : ORDER).concat(k ? ORDER_ADV.slice(0, Math.max(16, Math.min(di * n, NA))) : []);
+  const learnedPool = [].concat(...L.mix.map((cnt, b) => cnt ? BANKS[b].slice(0, Math.max(24, Math.min(di * n, BANKS[b].length))) : []));
   const pool = shuffle(learnedPool.filter(w => !fresh.includes(w) && !rv.includes(w)), r);
   const filled = [];
   while (rv.length + filled.length < CONFIG.reviewWordsPerDay && pool.length) filled.push(pool.shift());
@@ -1259,12 +1671,12 @@ function pickSoundAlike(target, n, r) {
 }
 
 function buildQuiz(date, plan) {
-  const lv = lvOf(plan.level), TYPES = LEVELS[lv].types;
+  const lv = plan.lvScheme === LV_SCHEME ? lvOf(plan.level) : (OLD_LV[plan.level] || 1), TYPES = LEVELS[lv].types;
   const { fresh, review, extra, r } = dayWords(date, plan.review, lv);
   const all = [...fresh, ...review, ...extra];
   let pool = shuffle(all, r);
   const shortSlots = TYPES.map((t, i) => (t === "puzzle" || t === "boss") ? i : -1).filter(i => i >= 0);
-  const shorts = pool.filter(w => w.length >= 4 && w.length <= (lv >= 4 ? 10 : 8)).slice(0, shortSlots.length);
+  const shorts = pool.filter(w => w.length >= 4 && w.length <= (lv >= 4 ? 11 : 9)).slice(0, shortSlots.length);
   const assign = new Array(TYPES.length);
   shortSlots.forEach((s, i) => { if (shorts[i]) assign[s] = shorts[i]; });
   const rest = pool.filter(w => !assign.includes(w));
@@ -1274,7 +1686,7 @@ function buildQuiz(date, plan) {
 }
 
 function makeQ(type, w, r, dayPool, lv) {
-  const t = WMAP[w], L = LEVELS[lv], hard = lv >= 3;
+  const t = WMAP[w], L = LEVELS[lv], hard = lv >= 2;
   const q = { type, w, limit: 10 };
   const engOpts = () => shuffle([w, ...(hard ? pickSoundAlike(w, 3, r) : pickDistractors(w, 3, r))], r);
   if (type === "ox") {
@@ -1385,24 +1797,27 @@ async function cancelPush(p, seqs) {
   await Promise.all(seqs.map(q => fetch(`${NTFY()}/${CONFIG.ntfyTopics[p]}/${encodeURIComponent(q)}`, { method: "DELETE" }).catch(() => {})));
 }
 const nagSeqs = d => [`done-${d}`, ...Array.from({ length: 12 }, (_, i) => `nag-${d}-${i + 1}`), `last-${d}`];
-/* 내가 다 풀었고 상대는 아직일 때: 첫 알림 + 1시간마다 재촉 + 마감 알림 예약 */
-async function scheduleNags(d) {
-  const me = P(S.me), oppId = other(S.me), opp = P(oppId);
+/* 내가 다 풀었을 때 아직 안 푼 사람들에게: 첫 알림 + 1시간마다 재촉 + 마감 알림 예약.
+   이미 다른 사람이 예약해 둔 게 있으면 지우고 '끝낸 사람 목록'을 갱신해서 다시 예약 */
+async function scheduleNags(d, targets, finishers) {
+  const me = P(S.me), fin = names(finishers);
   const first = pushTime(now()), last = kstAt(d, CONFIG.lastCall.h, CONFIG.lastCall.m), times = [];
-  if (first < revealAt(d)) {
-    await notify([oppId], `${me.emoji} ${josa(me.name, "이", "가")} 다 풀었어!`, `오늘 영어 대결 끝! ${opp.name}도 빨리 도전해! 🔥 (마감 밤 ${HOUR_TXT})`, { at: first, seq: `done-${d}`, tags: ["fire"], priority: 4, silent: DEMO });
-    times.push(first);
-  }
   const step = (CONFIG.nagEveryMinutes || 60) * 60000;
-  for (let t = first + step, i = 1; t < last - 15 * 60000 && i <= 12; t += step, i++) {
-    await notify([oppId], `⏰ ${opp.name}, 아직이야?`, `${josa(me.name, "은", "는")} 벌써 끝냈어! 마감은 밤 ${HOUR_TXT}. 빨리 도전해! 🔥`, { at: t, seq: `nag-${d}-${i}`, tags: ["alarm_clock"], priority: 4, silent: DEMO });
-    times.push(t);
+  for (const t of targets) await cancelPush(t, nagSeqs(d));
+  if (!DEMO) await new Promise(r => setTimeout(r, 1500));
+  if (first < revealAt(d)) times.push(first);
+  for (let t = first + step, i = 1; t < last - 15 * 60000 && i <= 12; t += step, i++) times.push(t);
+  for (const tid of targets) {
+    const you = P(tid).name;
+    if (first < revealAt(d)) await notify([tid], `${me.emoji} ${josa(me.name, "이", "가")} 다 풀었어!`, `${josa(fin, "은", "는")} 끝! ${you}도 빨리 도전해! 🔥 (마감 밤 ${HOUR_TXT})`, { at: first, seq: `done-${d}`, tags: ["fire"], priority: 4, silent: DEMO });
+    let i = 1;
+    for (const t of times.slice(first < revealAt(d) ? 1 : 0)) {
+      await notify([tid], `⏰ ${you}, 아직이야?`, `${josa(fin, "은", "는")} 벌써 끝냈어! 마감은 밤 ${HOUR_TXT}. 빨리 도전해! 🔥`, { at: t, seq: `nag-${d}-${i++}`, tags: ["alarm_clock"], priority: 4, silent: DEMO });
+    }
+    if (now() < last) await notify([tid], "⏰ 마감 30분 남았어!", `오늘 영어 대결이 밤 ${HOUR_TXT}에 마감돼요. 지금 바로 풀어요! 🏃`, { at: last, seq: `last-${d}`, tags: ["rotating_light"], priority: 5, silent: DEMO });
   }
-  if (now() < last) {
-    await notify([oppId], "⏰ 마감 30분 남았어!", `오늘 영어 대결이 밤 ${HOUR_TXT}에 마감돼요. 지금 바로 풀어요! 🏃`, { at: last, seq: `last-${d}`, tags: ["rotating_light"], priority: 5, silent: DEMO });
-    times.push(last);
-  }
-  if (DEMO) toast(`📣 (체험) ${opp.name}에게 알림 예약: ${times.map(hhmm).join(", ")}`, 6000);
+  if (now() < last) times.push(last);
+  if (DEMO) toast(`📣 (체험) ${names(targets)}에게 알림 예약: ${times.map(hhmm).join(", ")}`, 6000);
   return times;
 }
 
@@ -1430,7 +1845,7 @@ const app = document.getElementById("app");
 const S = { me: LS.get("duel-me", null), tab: "home", results: [], settings: null, game: null, detail: null, loading: false, err: "" };
 function toast(msg, ms = 3200) { const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), ms); }
 function confetti(n = 50) { const em = ["🎉", "⭐", "🏆", "✨", "🎊", "👑"]; for (let i = 0; i < n; i++) { const c = document.createElement("div"); c.className = "confetti"; c.textContent = em[i % em.length]; c.style.left = Math.random() * 100 + "vw"; c.style.animationDuration = 2 + Math.random() * 2.5 + "s"; c.style.animationDelay = Math.random() * .8 + "s"; document.body.appendChild(c); setTimeout(() => c.remove(), 5500); } }
-const DEFAULT_SETTINGS = { dailyPrize: "🍦 오늘의 왕: 디저트 고르기 권", weeklyPrize: "🍗 주간 챔피언: 주말 저녁 메뉴 선택권", monthlyPrize: "🎁 이달의 MVP: 원하는 선물 1개 (2만원 이내)", bonus: { dad: 0, son: 0 }, level: CONFIG.defaultLevel };
+const DEFAULT_SETTINGS = { dailyPrize: "🍦 오늘의 왕: 디저트 고르기 권", weeklyPrize: "🍗 주간 챔피언: 주말 저녁 메뉴 선택권", monthlyPrize: "🎁 이달의 MVP: 원하는 선물 1개 (2만원 이내)", bonus: { dad: 0, mom: 0, son: 0 }, level: CONFIG.defaultLevel, lvScheme: LV_SCHEME };
 
 /* ===================== 데이터 불러오기 / 집계 ===================== */
 async function loadAll() {
@@ -1438,7 +1853,8 @@ async function loadAll() {
   try {
     const [res, st] = await Promise.all([DB.list("results"), DB.get("meta/settings")]);
     S.results = res; S.settings = Object.assign({}, DEFAULT_SETTINGS, st || {}); S.err = "";
-    const tp = await DB.get("plans/" + todayKey()).catch(() => null); S.todayLevel = tp ? lvOf(tp.level) : null;
+    if (S.settings.lvScheme !== LV_SCHEME) { S.settings.level = CONFIG.defaultLevel; S.settings.lvScheme = LV_SCHEME; }
+    const tp = await DB.get("plans/" + todayKey()).catch(() => null); S.todayLevel = tp ? (tp.lvScheme === LV_SCHEME ? lvOf(tp.level) : (OLD_LV[tp.level] || 1)) : null;
   } catch (e) { S.err = "서버에 연결하지 못했어요. 인터넷을 확인해 주세요. (" + e.message + ")"; S.settings = S.settings || { ...DEFAULT_SETTINGS }; }
   S.loading = false;
 }
@@ -1446,30 +1862,33 @@ const resOf = (date, p) => S.results.find(x => x.date === date && x.player === p
 const total = x => x ? (x.score || 0) + (x.bonus || 0) : 0;
 
 function outcome(date) {
-  const d = resOf(date, "dad"), s = resOf(date, "son");
-  const dd = d && d.status === "done" ? d : null, sd = s && s.status === "done" ? s : null;
-  if (!dd && !sd) return { winner: null, dad: d, son: s, none: true };
-  if (dd && !sd) return { winner: "dad", dad: d, son: s, forfeit: true };
-  if (sd && !dd) return { winner: "son", dad: d, son: s, forfeit: true };
-  const a = total(dd), b = total(sd);
-  if (a !== b) return { winner: a > b ? "dad" : "son", dad: d, son: s };
-  if (dd.timeMs !== sd.timeMs) return { winner: dd.timeMs < sd.timeMs ? "dad" : "son", dad: d, son: s, byTime: true };
-  return { winner: "draw", dad: d, son: s };
+  const done = PIDS.map(p => resOf(date, p)).filter(x => x && x.status === "done");
+  if (!done.length) return { winner: null, none: true, rank: {} };
+  const sorted = done.slice().sort((a, b) => total(b) - total(a) || a.timeMs - b.timeMs);
+  const rank = {}; sorted.forEach((x, i) => rank[x.player] = i + 1);
+  const top = sorted[0], co = sorted.filter(x => total(x) === total(top) && x.timeMs === top.timeMs).map(x => x.player);
+  if (co.length > 1) return { winner: "draw", co, rank };
+  return { winner: top.player, rank, forfeit: done.length === 1, byTime: !!(sorted[1] && total(sorted[1]) === total(top)) };
 }
+const isWinner = (o, p) => o && (o.winner === p || (o.winner === "draw" && o.co.includes(p)));
+const winText = o => o.winner === "draw" ? `🤝 공동 1위: ${o.co.map(p => P(p).emoji + " " + esc(P(p).name)).join(", ")}` : `👑 오늘의 왕: ${P(o.winner).emoji} ${esc(P(o.winner).name)}${o.forfeit ? " (부전승)" : o.byTime ? " (시간 차 승리)" : ""}`;
 function revealedDates() {
   const set = new Set(S.results.map(x => x.date));
   return [...set].filter(d => isRevealed(d)).sort();
 }
 function standing(dates) {
-  const st = { dad: { w: 0, l: 0, dr: 0, pts: 0 }, son: { w: 0, l: 0, dr: 0, pts: 0 }, days: 0 };
+  const st = { days: 0 }; PIDS.forEach(p => st[p] = { w: 0, l: 0, dr: 0, pts: 0 });
   for (const d of dates) {
     const o = outcome(d); if (o.none) continue; st.days++;
     PIDS.forEach(p => { const x = resOf(d, p); if (x && x.status === "done") st[p].pts += total(x); });
-    if (o.winner === "draw") { st.dad.dr++; st.son.dr++; }
-    else { st[o.winner].w++; st[other(o.winner)].l++; }
+    if (o.winner === "draw") o.co.forEach(p => st[p].dr++);
+    else { st[o.winner].w++; PIDS.forEach(p => { if (p !== o.winner && o.rank[p]) st[p].l++; }); }
   }
   const sc = p => st[p].w + st[p].dr * 0.5;
-  st.leader = st.days === 0 ? null : sc("dad") !== sc("son") ? (sc("dad") > sc("son") ? "dad" : "son") : st.dad.pts !== st.son.pts ? (st.dad.pts > st.son.pts ? "dad" : "son") : "draw";
+  st.order = PIDS.slice().sort((a, b) => sc(b) - sc(a) || st[b].pts - st[a].pts);
+  const [a, b] = st.order;
+  st.leader = st.days === 0 ? null : (sc(a) === sc(b) && st[a].pts === st[b].pts) ? "draw" : a;
+  st.score = sc;
   return st;
 }
 function streak(p) {
@@ -1499,20 +1918,21 @@ function render() {
 }
 function renderPick() {
   app.innerHTML = `<div class="center" style="padding-top:40px"><div style="font-size:64px">⚔️</div><h1>영어 5분 대결</h1><p class="sub">이 폰의 주인은 누구인가요?</p>
-  ${PIDS.map(p => `<button class="btn ${p === "son" ? "" : "sec"}" data-act="pick" data-p="${p}" style="font-size:26px;padding:22px">${P(p).emoji} ${esc(P(p).name)}</button>`).join("")}
+  ${PIDS.map(p => `<button class="btn ${p === "son" ? "" : "sec"}" data-act="pick" data-p="${p}" style="font-size:24px;padding:18px">${P(p).emoji} ${esc(P(p).name)}</button>`).join("")}
   <p class="sub">처음 한 번만 고르면 돼요.</p></div>`;
 }
 
 function curLv() { return lvOf(S.todayLevel || (S.settings && S.settings.level) || CONFIG.defaultLevel); }
 function statusOf(x) { if (!x) return "😴 아직 안 함"; if (x.status === "done") return "✅ 완료"; return "⏳ 도전 중"; }
-function playerBox(p, date, crown) {
+function playerBox(p, date, o) {
   const x = resOf(date, p), rev = isRevealed(date);
   const showScore = x && x.status === "done" && (rev || p === S.me);
-  return `<div class="pl ${p}"><span class="crown">${crown === p ? "👑" : crown === "draw" ? "🤝" : ""}</span><div class="emo">${P(p).emoji}</div><div class="nm">${esc(P(p).name)}${p === S.me ? " <span class='sub'>(나)</span>" : ""}</div>
+  const crown = o && isWinner(o, p) ? (o.winner === "draw" ? "🤝" : "👑") : (o && o.rank && o.rank[p] ? ["", "", "🥈", "🥉"][o.rank[p]] : "");
+  return `<div class="pl ${p}"><span class="crown">${crown}</span><div class="emo">${P(p).emoji}</div><div class="nm">${esc(P(p).name)}${p === S.me ? "<div class='sub' style='font-size:11px'>(나)</div>" : ""}</div>
   <div class="st">${statusOf(x)}</div><div class="sc">${showScore ? total(x) + "점" : x && x.status === "done" ? "🔒" : "-"}</div></div>`;
 }
 function viewHome() {
-  const d = todayKey(), mine = resOf(d, S.me), opp = resOf(d, other(S.me));
+  const d = todayKey(), mine = resOf(d, S.me);
   const rev = isRevealed(d), open = isOpen(d);
   const o = rev ? outcome(d) : null;
   const prog = LS.get(progKey(d), null);
@@ -1525,21 +1945,22 @@ function viewHome() {
   const cd = rev ? "" : `<div class="center sub">결과 발표까지</div><div class="center count" id="cd">${fmtDur(revealAt(d) - now())}</div>`;
   let resultLine = "";
   if (rev && o && !o.none) {
-    resultLine = o.winner === "draw" ? `<div class="center big" style="font-size:22px">🤝 무승부!</div>` :
-      `<div class="center big" style="font-size:22px">👑 오늘의 왕: ${P(o.winner).emoji} ${esc(P(o.winner).name)}${o.forfeit ? " (부전승)" : o.byTime ? " (시간 차 승리)" : ""}</div><div class="prize center">${esc(S.settings.dailyPrize)}</div>`;
+    resultLine = `<div class="center big" style="font-size:21px;margin-top:10px">${winText(o)}</div><div class="prize center">${esc(S.settings.dailyPrize)}</div>`;
   }
   let oppNudge = "";
-  if (!rev && opp && opp.status === "done" && !(mine && mine.status === "done")) oppNudge = `<div class="card center" style="background:#5a1f3a">🔥 ${esc(josa(P(other(S.me)).name, "이", "가"))} 벌써 다 풀었어요! 빨리 도전하세요!</div>`;
+  const doneO = others(S.me).filter(p => { const x = resOf(d, p); return x && x.status === "done"; });
+  if (!rev && doneO.length && !(mine && mine.status === "done")) oppNudge = `<div class="card center" style="background:#5a1f3a">🔥 ${esc(josa(names(doneO), "이", "가"))} 벌써 다 풀었어요! 빨리 도전하세요!</div>`;
   return `<div class="row between"><div><h1>⚔️ 영어 5분 대결</h1><div class="sub">${prettyDate(d)} · 난이도 ${curLv()}단계 ${LEVELS[curLv()].name}</div></div><div class="center"><div style="font-size:12px" class="sub">연속</div><div class="jua" style="font-size:20px">🔥${streak(S.me)}일</div></div></div>
-  <div class="card">${cd}<div class="vs" style="margin-top:10px">${playerBox("dad", d, o && o.winner)}<div class="vsmark">VS</div>${playerBox("son", d, o && o.winner)}</div>${resultLine}</div>
+  <div class="card">${cd}<div class="vs3" style="margin-top:10px">${PIDS.map(p => playerBox(p, d, o)).join("")}</div>${resultLine}</div>
   ${oppNudge}${btn}
   <div class="card"><div class="row between"><h3 style="margin:0">📆 이번 주 승부</h3><span class="sub">월~일</span></div>${weekBar(wk)}<div class="sub" style="margin-top:6px">${esc(S.settings.weeklyPrize)}</div></div>`;
 }
 function weekBar(st) {
-  const a = st.dad.w + st.dad.dr * .5, b = st.son.w + st.son.dr * .5, t = a + b || 1;
-  return `<div class="row between jua" style="font-size:20px;margin-top:8px"><span style="color:var(--dad)">${P("dad").emoji} ${st.dad.w}승</span><span class="sub" style="font-size:14px">${st.dad.dr ? "무 " + st.dad.dr : ""}</span><span style="color:var(--son)">${st.son.w}승 ${P("son").emoji}</span></div>
-  <div class="bar2"><div class="d" style="width:${a / t * 100}%"></div><div class="s" style="width:${b / t * 100}%"></div></div>
-  <div class="row between sub"><span>총 ${st.dad.pts}점</span><span>${st.leader && st.leader !== "draw" ? "선두: " + P(st.leader).emoji : st.leader === "draw" ? "팽팽!" : "아직 기록 없음"}</span><span>총 ${st.son.pts}점</span></div>`;
+  const mx = Math.max(1, ...PIDS.map(p => st.score(p)));
+  return `<div class="rank">${st.order.map((p, i) => `<div class="nm">${st.days ? ["🥇", "🥈", "🥉"][i] : ""} ${P(p).emoji} ${esc(P(p).name)}</div>
+    <div class="bar"><div style="width:${st.score(p) / mx * 100}%;background:${COLOR[p]}"></div></div>
+    <div class="w">${st[p].w}승${st[p].dr ? ` <span class="sub" style="font-size:12px">무${st[p].dr}</span>` : ""} <span class="sub" style="font-size:12px">${st[p].pts}점</span></div>`).join("")}</div>
+  <div class="sub center" style="margin-top:4px">${st.leader === "draw" ? "팽팽!" : st.leader ? "" : "아직 기록 없음"}</div>`;
 }
 function viewFame() {
   const d = todayKey(), dates = revealedDates();
@@ -1548,31 +1969,31 @@ function viewFame() {
   const weeks = [...new Set(dates.map(weekStart))].filter(w => w !== weekStart(d)).sort().reverse();
   const months = [...new Set(dates.map(x => x.slice(0, 7)))].filter(m => m !== d.slice(0, 7)).sort().reverse();
   const champ = (st) => st.leader === "draw" ? "🤝 공동 우승" : st.leader ? `${P(st.leader).emoji} ${esc(P(st.leader).name)}` : "-";
-  const daysWon = PIDS.map(p => dates.filter(x => outcome(x).winner === p).length);
+  const rec = st => PIDS.map(p => st[p].w).join(":");
   return `<h1>🏆 시상식</h1>
   <div class="card"><h3>📆 이번 주 챔피언 레이스</h3>${weekBar(wk)}<div class="prize">${esc(S.settings.weeklyPrize)}</div><div class="sub" style="margin-top:6px">일요일 밤 ${HOUR_TXT} 결과로 확정돼요. 승수가 같으면 총점으로 가려요.</div></div>
   <div class="card"><h3>🗓️ ${+d.slice(5, 7)}월 MVP 레이스</h3>${weekBar(mo)}<div class="prize">${esc(S.settings.monthlyPrize)}</div></div>
-  <div class="card"><h3>🎖️ 역대 주간 챔피언</h3>${weeks.length ? `<table><tr><th>주</th><th>챔피언</th><th>전적</th></tr>${weeks.map(w => { const st = standing(dates.filter(x => weekStart(x) === w)); return `<tr><td>${prettyDate(w)}~</td><td>${champ(st)}</td><td class="sub">${st.dad.w}:${st.son.w}</td></tr>`; }).join("")}</table>` : `<div class="sub">첫 주가 끝나면 여기에 이름이 올라가요!</div>`}</div>
-  <div class="card"><h3>🥇 역대 이달의 MVP</h3>${months.length ? `<table>${months.map(m => { const st = standing(dates.filter(x => x.slice(0, 7) === m)); return `<tr><td>${m.replace("-", "년 ")}월</td><td>${champ(st)}</td><td class="sub">${st.dad.w}:${st.son.w}</td></tr>`; }).join("")}</table>` : `<div class="sub">첫 달이 끝나면 여기에 이름이 올라가요!</div>`}</div>
-  <div class="card"><h3>📊 통산 기록</h3><div class="row between jua" style="font-size:19px"><span>${P("dad").emoji} ${daysWon[0]}승 · 🔥${streak("dad")}일</span><span>${P("son").emoji} ${daysWon[1]}승 · 🔥${streak("son")}일</span></div></div>`;
+  <div class="card"><h3>🎖️ 역대 주간 챔피언</h3>${weeks.length ? `<table><tr><th>주</th><th>챔피언</th><th>전적</th></tr>${weeks.map(w => { const st = standing(dates.filter(x => weekStart(x) === w)); return `<tr><td>${prettyDate(w)}~</td><td>${champ(st)}</td><td class="sub">${rec(st)}</td></tr>`; }).join("")}</table><div class="sub">전적: ${PIDS.map(p => P(p).emoji).join(":")} 승수</div>` : `<div class="sub">첫 주가 끝나면 여기에 이름이 올라가요!</div>`}</div>
+  <div class="card"><h3>🥇 역대 이달의 MVP</h3>${months.length ? `<table>${months.map(m => { const st = standing(dates.filter(x => x.slice(0, 7) === m)); return `<tr><td>${m.replace("-", "년 ")}월</td><td>${champ(st)}</td><td class="sub">${rec(st)}</td></tr>`; }).join("")}</table>` : `<div class="sub">첫 달이 끝나면 여기에 이름이 올라가요!</div>`}</div>
+  <div class="card"><h3>📊 통산 기록</h3>${(() => { const all = standing(dates); return PIDS.map(p => `<div class="row between jua" style="font-size:18px;margin:6px 0"><span>${P(p).emoji} ${esc(P(p).name)}</span><span>${all[p].w}승 · 🔥연속 ${streak(p)}일</span></div>`).join(""); })()}</div>`;
 }
 function viewLog() {
   const dates = [...new Set(S.results.map(x => x.date))].sort().reverse().slice(0, 60);
   if (!dates.length) return `<h1>📅 기록</h1><div class="card sub">아직 기록이 없어요. 오늘 첫 대결을 시작해 보세요!</div>`;
-  return `<h1>📅 기록</h1><div class="card"><table><tr><th>날짜</th><th>${P("dad").emoji}</th><th>${P("son").emoji}</th><th>승자</th></tr>
-  ${dates.map(d => { const rev = isRevealed(d), o = outcome(d); const cell = p => { const x = resOf(d, p); if (!x) return "-"; if (x.status !== "done") return "⏳"; return rev || p === S.me ? total(x) : "🔒"; }; return `<tr class="click" data-act="detail" data-d="${d}"><td>${prettyDate(d)}</td><td>${cell("dad")}</td><td>${cell("son")}</td><td>${!rev ? "🔒" : o.winner === "draw" ? "🤝" : o.winner ? P(o.winner).emoji : "-"}</td></tr>`; }).join("")}</table><div class="sub" style="margin-top:6px">날짜를 누르면 오답노트를 볼 수 있어요.</div></div>`;
+  return `<h1>📅 기록</h1><div class="card"><table><tr><th>날짜</th>${PIDS.map(p => `<th>${P(p).emoji}</th>`).join("")}<th>1등</th></tr>
+  ${dates.map(d => { const rev = isRevealed(d), o = outcome(d); const cell = p => { const x = resOf(d, p); if (!x) return "-"; if (x.status !== "done") return "⏳"; return rev || p === S.me ? total(x) : "🔒"; }; return `<tr class="click" data-act="detail" data-d="${d}"><td>${prettyDate(d)}</td>${PIDS.map(p => `<td>${cell(p)}</td>`).join("")}<td>${!rev ? "🔒" : o.winner === "draw" ? "🤝" : o.winner ? P(o.winner).emoji : "-"}</td></tr>`; }).join("")}</table><div class="sub" style="margin-top:6px">날짜를 누르면 오답노트를 볼 수 있어요.</div></div>`;
 }
 function viewDetail(d) {
   const rev = isRevealed(d), o = outcome(d);
   const box = p => { const x = resOf(d, p); const show = x && x.status === "done" && (rev || p === S.me);
-    return `<div class="pl ${p}"><span class="crown">${rev && o.winner === p ? "👑" : rev && o.winner === "draw" ? "🤝" : ""}</span><div class="emo">${P(p).emoji}</div><div class="nm">${esc(P(p).name)}</div>
-    ${show ? `<div class="sc">${total(x)}점</div><div class="st">정답 ${x.correct}/${x.total} · ${fmtSec(x.timeMs)}${x.bonus ? `<br>핸디캡 +${x.bonus}` : ""}<br>최고 콤보 ${x.maxCombo || 0}</div>` : `<div class="sc">${x && x.status === "done" ? "🔒" : "-"}</div><div class="st">${statusOf(x)}</div>`}</div>`; };
+    return `<div class="pl ${p}"><span class="crown">${rev && isWinner(o, p) ? (o.winner === "draw" ? "🤝" : "👑") : rev && o.rank[p] ? ["", "", "🥈", "🥉"][o.rank[p]] : ""}</span><div class="emo">${P(p).emoji}</div><div class="nm">${esc(P(p).name)}</div>
+    ${show ? `<div class="sc">${total(x)}점</div><div class="st">정답 ${x.correct}/${x.total}<br>${fmtSec(x.timeMs)}${x.bonus ? `<br>핸디캡 +${x.bonus}` : ""}<br>최고 콤보 ${x.maxCombo || 0}</div>` : `<div class="sc">${x && x.status === "done" ? "🔒" : "-"}</div><div class="st">${statusOf(x)}</div>`}</div>`; };
   const wrong = {};
   PIDS.forEach(p => { const x = resOf(d, p); if (x && (rev || p === S.me)) (x.wrongWords || []).forEach(w => { (wrong[w] = wrong[w] || []).push(p); }); });
   const wl = Object.keys(wrong).filter(w => WMAP[w]);
   return `<button class="btn sec small" data-act="back" style="width:auto;display:inline-block;padding:8px 14px">← 뒤로</button><h1>${prettyDate(d)} 결과</h1>
-  <div class="card"><div class="vs">${box("dad")}<div class="vsmark">VS</div>${box("son")}</div>
-  ${rev && !o.none ? `<div class="center big" style="font-size:22px;margin-top:10px">${o.winner === "draw" ? "🤝 무승부!" : `👑 ${esc(P(o.winner).name)} 승리!${o.forfeit ? " (부전승)" : o.byTime ? " (점수 같아서 더 빠른 쪽 승)" : ""}`}</div>` : !rev ? `<div class="center sub" style="margin-top:10px">🔒 상대 점수는 밤 ${HOUR_TXT}에 공개돼요</div>` : ""}</div>
+  <div class="card"><div class="vs3">${PIDS.map(box).join("")}</div>
+  ${rev && !o.none ? `<div class="center big" style="font-size:21px;margin-top:10px">${winText(o)}</div>` : !rev ? `<div class="center sub" style="margin-top:10px">🔒 상대 점수는 밤 ${HOUR_TXT}에 공개돼요</div>` : ""}</div>
   <div class="card"><h3>📒 오답노트</h3>${wl.length ? wl.map(w => wordCard(w, wrong[w].map(p => P(p).emoji).join(""))).join("") : `<div class="sub">틀린 단어가 없어요. 대단해요! 🎉</div>`}
   ${wl.length ? `<div class="sub" style="margin-top:6px">여기 단어들은 다음 날 복습 문제로 다시 나와요.</div>` : ""}</div>`;
 }
@@ -1614,10 +2035,10 @@ function viewSet() {
   <div class="sub" style="margin-top:6px">🔕 푸시 금지: ${CONFIG.quietHours.from}시~${CONFIG.quietHours.to}시 · 재촉 ${CONFIG.nagEveryMinutes}분마다 · 마감 알림 ${CONFIG.lastCall.h}:${String(CONFIG.lastCall.m).padStart(2, "0")}</div></div>
   ${DEMO_OR_TEST() && (adm || DEMO) ? `<div class="card"><h3>🧪 테스트 도구</h3>
   <button class="btn sec small" data-act="revealNow">${LS.get("duel-reveal-now", false) ? "✅ 결과 바로 공개 중 (누르면 끔)" : "결과 바로 공개하기 (10시 안 기다림)"}</button>
-  <button class="btn sec small" data-act="fakeOpp">상대 기록 가짜로 만들기 (오늘)</button>
+  <button class="btn sec small" data-act="fakeOpp">다른 사람들 기록 가짜로 만들기 (오늘)</button>
   <button class="btn sec small" data-act="resetToday">오늘 내 기록 지우기</button>
   <button class="btn sec small" data-act="fakeWeek">지난 2주 가짜 기록 만들기</button></div>` : ""}
-  <p class="sub center">단어 ${ORDER.length + ORDER_ADV.length}개 (중1 ${ORDER.length} + 중2~3 ${ORDER_ADV.length}) · 하루 새 단어 ${CONFIG.newWordsPerDay}개 + 복습 ${CONFIG.reviewWordsPerDay}개</p>`;
+  <p class="sub center">단어 ${ALL_ORDER.length}개 (중1 ${ORDER.length} + 중2~3 ${ORDER_ADV.length} + 고1 ${ORDER_HS.length}) · 하루 새 단어 ${CONFIG.newWordsPerDay}개 + 복습 ${CONFIG.reviewWordsPerDay}개</p>`;
 }
 
 /* ===================== 게임 진행 ===================== */
@@ -1630,7 +2051,7 @@ async function getPlan(date) {
   const y = dateAdd(date, -1);
   const prev = await Promise.all(PIDS.map(p => DB.get(resPath(y, p))));
   const review = [...new Set(prev.filter(Boolean).flatMap(x => x.wrongWords || []))].sort();
-  plan = { date, review, level: lvOf((S.settings && S.settings.level) || CONFIG.defaultLevel), createdBy: S.me, createdAt: now() };
+  plan = { date, review, level: lvOf((S.settings && S.settings.level) || CONFIG.defaultLevel), lvScheme: LV_SCHEME, createdBy: S.me, createdAt: now() };
   await DB.set("plans/" + date, plan);
   return plan;
 }
@@ -1669,7 +2090,7 @@ function showStudy() {
   app.innerHTML = `<div class="qtop"><span>📖 오늘의 단어 외우기</span><span class="count" id="st">${SEC}</span></div>
   <div class="timer"><div id="tbar" style="width:100%"></div></div>
   <div class="sub">새 단어 ${g.quiz.fresh.length}개 + 복습 ${g.quiz.review.length}개. 🔊를 눌러 발음도 들어 보세요!</div>
-  ${g.quiz.fresh.map(w => wordCard(w, WMAP[w].adv ? "NEW·중2~3" : "NEW")).join("")}${g.quiz.review.map(w => wordCard(w, "복습")).join("")}
+  ${g.quiz.fresh.map(w => wordCard(w, "NEW·" + BANK_NAME[WMAP[w].adv])).join("")}${g.quiz.review.map(w => wordCard(w, "복습")).join("")}
   <button class="btn" data-act="ready" style="position:sticky;bottom:10px">다 외웠어! 시작 →</button>`;
   clearInterval(g.tick);
   g.tick = setInterval(() => {
@@ -1833,22 +2254,19 @@ async function finishGame() {
   let saved = false;
   for (let i = 0; i < 3 && !saved; i++) { try { await DB.set(resPath(g.date, S.me), doc); saved = true; } catch (e) { await new Promise(r => setTimeout(r, 1500)); } }
   LS.set(progKey(g.date), { done: true });
-  let oppDone = false;
-  try { const o = await DB.get(resPath(g.date, other(S.me))); oppDone = !!(o && o.status === "done"); } catch (e) {}
-  const me = P(S.me), opp = P(other(S.me));
+  const pending = [], doneO = [];
+  for (const p of others(S.me)) { let o = null; try { o = await DB.get(resPath(g.date, p)); } catch (e) {} (o && o.status === "done" ? doneO : pending).push(p); }
+  const me = P(S.me);
+  await cancelPush(S.me, nagSeqs(g.date));     // 나한테 예약돼 있던 재촉 알림 취소
   let nagTimes = [];
-  if (!oppDone) {
-    nagTimes = await scheduleNags(g.date);
-    if (isOpen(g.date)) await notify(PIDS, "🏆 오늘의 결과 발표!", "누가 이겼을까? 앱을 열어서 확인해 보세요 👀", { at: revealAt(g.date), seq: `res-${g.date}`, tags: ["trophy"], priority: 4, silent: true });
-  } else {
-    await cancelPush(S.me, nagSeqs(g.date));   // 나한테 예약돼 있던 재촉 알림 취소
-    await notify([other(S.me)], `${me.emoji} ${me.name}도 다 풀었어!`, `둘 다 끝! 결과는 밤 ${HOUR_TXT}에 공개돼요 🔒`, { tags: ["lock"], silent: DEMO });
-  }
+  if (pending.length) nagTimes = await scheduleNags(g.date, pending, [...doneO, S.me]);
+  if (!doneO.length && isOpen(g.date)) await notify(PIDS, "🏆 오늘의 결과 발표!", "누가 이겼을까? 앱을 열어서 확인해 보세요 👀", { at: revealAt(g.date), seq: `res-${g.date}`, tags: ["trophy"], priority: 4, silent: true });
+  if (doneO.length) await notify(doneO, `${me.emoji} ${me.name}도 다 풀었어!`, pending.length ? `이제 ${josa(names(pending), "만", "만")} 남았어요. 결과는 밤 ${HOUR_TXT}에 공개 🔒` : `모두 끝! 결과는 밤 ${HOUR_TXT}에 공개돼요 🔒`, { tags: ["lock"], silent: DEMO });
   confetti(30); SFX.win();
   const wl = doc.wrongWords;
   app.innerHTML = `<div class="center" style="padding-top:24px"><div style="font-size:70px">🎉</div><h1>오늘 도전 완료!</h1>
   <div class="count" style="font-size:52px">${doc.score}점</div><div class="sub">정답 ${correct}/${g.qs.length} · ${fmtSec(timeMs)} · 최고 콤보 ${g.maxCombo}${bonus ? ` · 핸디캡 +${bonus}` : ""}</div></div>
-  <div class="card center">${oppDone ? `📣 ${esc(opp.name)}에게 "나도 끝!" 알림을 보냈어요.<br>` : nagTimes.length ? `📣 ${esc(opp.name)}에게 "빨리 풀어!" 알림 예정<br><span class="sub">${nagTimes.map(hhmm).join(" · ")}<br>(${esc(opp.name)}이 다 풀면 남은 알림은 자동 취소)</span><br>` : ""}<b>결과는 오늘 밤 ${HOUR_TXT}에 공개!</b>${saved ? "" : `<br><span style="color:var(--bad)">⚠️ 서버 저장 실패 — 인터넷 연결 후 앱을 다시 열어 주세요</span>`}</div>
+  <div class="card center">${doneO.length ? `📣 ${esc(names(doneO))}에게 "나도 끝!" 알림을 보냈어요.<br>` : ""}${pending.length && nagTimes.length ? `📣 ${esc(names(pending))}에게 "빨리 풀어!" 알림 예정<br><span class="sub">${nagTimes.map(hhmm).join(" · ")}<br>(다 풀면 그 사람의 남은 알림은 자동 취소)</span><br>` : !pending.length ? "🎉 모두 다 풀었어요!<br>" : ""}<b>결과는 오늘 밤 ${HOUR_TXT}에 공개!</b>${saved ? "" : `<br><span style="color:var(--bad)">⚠️ 서버 저장 실패 — 인터넷 연결 후 앱을 다시 열어 주세요</span>`}</div>
   <div class="card"><h3>📒 오늘의 오답노트</h3>${wl.length ? wl.map(w => wordCard(w)).join("") : `<div class="sub">하나도 안 틀렸어요! 🏅</div>`}</div>
   <button class="btn" data-act="home">홈으로</button>`;
   if (!saved) LS.set("duel-unsaved", doc);
@@ -1878,17 +2296,17 @@ const ACT = {
   kb(d) { kbKey(d.k); },
   kbDel() { const g = S.game; if (g.locked) return; g.kb = g.kb.slice(0, -1); drawKb(); },
   kbGo() { kbGo(); },
-  switch() { if (!isAdmin() && !DEMO) return; if (!S.switchArm) { S.switchArm = true; render(); return; } S.switchArm = false; S.me = other(S.me); LS.set("duel-me", S.me); render(); toast(`이제 ${P(S.me).emoji} ${P(S.me).name}(으)로 플레이해요`); },
+  switch() { if (!isAdmin() && !DEMO) return; if (!S.switchArm) { S.switchArm = true; render(); return; } S.switchArm = false; S.me = PIDS[(PIDS.indexOf(S.me) + 1) % PIDS.length]; LS.set("duel-me", S.me); render(); toast(`이제 ${P(S.me).emoji} ${P(S.me).name}(으)로 플레이해요`); },
   async lvl(d) {
     if (!isAdmin()) return toast("설정은 아빠만 바꿀 수 있어요");
-    const st = Object.assign({}, S.settings, { level: +d.v });
+    const st = Object.assign({}, S.settings, { level: +d.v, lvScheme: LV_SCHEME });
     try { await DB.set("meta/settings", st); S.settings = st; toast(`난이도 ${d.v}단계로 바꿨어요`); } catch (e) { toast("저장 실패: " + e.message); }
     render();
   },
   sound() { LS.set("duel-sound", !LS.get("duel-sound", true)); render(); },
   async saveSet() {
     if (!isAdmin()) return toast("설정은 아빠만 바꿀 수 있어요");
-    const st = Object.assign({}, S.settings, { dailyPrize: document.getElementById("pz-d").value.trim(), weeklyPrize: document.getElementById("pz-w").value.trim(), monthlyPrize: document.getElementById("pz-m").value.trim(), bonus: { dad: Math.max(0, +document.getElementById("bn-dad").value || 0), son: Math.max(0, +document.getElementById("bn-son").value || 0) } });
+    const st = Object.assign({}, S.settings, { dailyPrize: document.getElementById("pz-d").value.trim(), weeklyPrize: document.getElementById("pz-w").value.trim(), monthlyPrize: document.getElementById("pz-m").value.trim(), bonus: Object.fromEntries(PIDS.map(p => [p, Math.max(0, +document.getElementById("bn-" + p).value || 0)])), lvScheme: LV_SCHEME });
     try { await DB.set("meta/settings", st); S.settings = st; toast("저장했어요 ✅"); } catch (e) { toast("저장 실패: " + e.message); }
     render();
   },
@@ -1902,7 +2320,7 @@ const ACT = {
   },
   testPush() { notify([S.me], "🔔 테스트 알림", "알림이 잘 와요! 오늘도 영어 대결 화이팅 💪", { tags: ["bell"], quiet: false }); toast("보냈어요. 몇 초 안에 알림이 와야 해요."); },
   revealNow() { LS.set("duel-reveal-now", !LS.get("duel-reveal-now", false)); render(); },
-  async fakeOpp() { if (!isAdmin() && !DEMO) return; const d = todayKey(), p = other(S.me); const correct = 7 + Math.floor(Math.random() * 6); await DB.set(resPath(d, p), fakeDoc(d, p, correct)); await loadAll(); render(); toast(`${P(p).name} 기록을 만들었어요`); },
+  async fakeOpp() { if (!isAdmin() && !DEMO) return; const d = todayKey(); for (const p of others(S.me)) await DB.set(resPath(d, p), fakeDoc(d, p, 6 + Math.floor(Math.random() * 7))); await loadAll(); render(); toast(`${names(others(S.me))} 기록을 만들었어요`); },
   async resetToday() { if (!isAdmin() && !DEMO) return; const d = todayKey(); await DB.del(resPath(d, S.me)); LS.del(progKey(d)); await loadAll(); render(); toast("오늘 내 기록을 지웠어요"); },
   async fakeWeek() { if (!isAdmin() && !DEMO) return; const d = todayKey(); for (let i = 1; i <= 14; i++) { const k = dateAdd(d, -i); for (const p of PIDS) if (Math.random() < 0.92) await DB.set(resPath(k, p), fakeDoc(k, p, 6 + Math.floor(Math.random() * 7))); } await loadAll(); render(); toast("지난 2주 기록을 만들었어요"); }
 };
@@ -1929,7 +2347,7 @@ async function flushUnsaved() { const u = LS.get("duel-unsaved", null); if (!u) 
 
 /* 결과 발표 순간 축하 */
 let celebrated = LS.get("duel-celebrated", "");
-function maybeCelebrate() { const d = todayKey(); if (celebrated === d || !isRevealed(d)) return; const o = outcome(d); if (o.none) return; celebrated = d; LS.set("duel-celebrated", d); if (o.winner === S.me) { confetti(60); SFX.win(); toast("👑 오늘은 내가 이겼다!"); } else if (o.winner === "draw") toast("🤝 오늘은 무승부!"); else toast(`${P(o.winner).emoji} 오늘은 ${josa(P(o.winner).name, "이", "가")} 이겼어요. 내일 설욕전!`); }
+function maybeCelebrate() { const d = todayKey(); if (celebrated === d || !isRevealed(d)) return; const o = outcome(d); if (o.none) return; celebrated = d; LS.set("duel-celebrated", d); if (isWinner(o, S.me)) { confetti(60); SFX.win(); toast(o.winner === "draw" ? "🤝 오늘은 공동 1위!" : "👑 오늘은 내가 1등!"); } else if (o.winner === "draw") toast(`🤝 오늘은 ${names(o.co)} 공동 1위!`); else toast(`${P(o.winner).emoji} 오늘은 ${josa(P(o.winner).name, "이", "가")} 1등이에요. 내일 설욕전!`); }
 
 (async function init() {
   if ("serviceWorker" in navigator && location.protocol === "https:") { try { navigator.serviceWorker.register("sw.js").catch(() => {}); } catch (e) {} }
