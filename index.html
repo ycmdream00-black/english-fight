@@ -1653,9 +1653,11 @@ function dayWords(date, review, lv) {
   return { fresh, review: rv, extra: filled, r };
 }
 
-function pickDistractors(target, n, r, exclude = []) {
+/* prefer(오늘 외운 단어들)에서 먼저 고르고, 모자라면 전체 단어장에서 채움 */
+function pickDistractors(target, n, r, exclude = [], prefer = null) {
   const t = WMAP[target]; const out = [];
-  for (const w of shuffle(ALL_ORDER, r)) {
+  const cand = prefer ? shuffle(prefer, r).concat(shuffle(ALL_ORDER, r)) : shuffle(ALL_ORDER, r);
+  for (const w of cand) {
     if (out.length >= n) break;
     if (w === target || exclude.includes(w) || out.includes(w)) continue;
     if (overlap(WMAP[w].m, t.m)) continue;
@@ -1688,18 +1690,20 @@ function buildQuiz(date, plan) {
 function makeQ(type, w, r, dayPool, lv) {
   const t = WMAP[w], L = LEVELS[lv], hard = lv >= 2;
   const q = { type, w, limit: 10 };
-  const engOpts = () => shuffle([w, ...(hard ? pickSoundAlike(w, 3, r) : pickDistractors(w, 3, r))], r);
+  /* 보기는 모두 '오늘 외운 단어'에서 뽑음 → 처음 보는 단어를 지우는 식으로는 못 맞힘 */
+  const dd = k => pickDistractors(w, k, r, [], dayPool);
+  const engOpts = () => shuffle([w, ...dd(3)], r);
   if (type === "ox") {
     q.limit = 6; q.truth = r() < 0.5;
-    q.shown = q.truth ? t.m : WMAP[pickDistractors(w, 1, r)[0]].m;
+    q.shown = q.truth ? t.m : WMAP[dd(1)[0]].m;
   } else if (type === "meaning") {
-    q.limit = 10; q.opts = shuffle([w, ...pickDistractors(w, 3, r)], r).map(x => WMAP[x].m); q.ans = t.m;
+    q.limit = 10; q.opts = shuffle([w, ...dd(3)], r).map(x => WMAP[x].m); q.ans = t.m;
   } else if (type === "word") {
     q.limit = 10; q.opts = engOpts(); q.ans = w;
   } else if (type === "listen") {
     q.limit = 12;
-    if (hard) { q.meaningMode = true; q.opts = shuffle([w, ...pickDistractors(w, 3, r)], r).map(x => WMAP[x].m); q.ans = t.m; }
-    else { q.opts = shuffle([w, ...pickSoundAlike(w, 3, r)], r); q.ans = w; }
+    if (hard) { q.meaningMode = true; q.opts = shuffle([w, ...dd(3)], r).map(x => WMAP[x].m); q.ans = t.m; }
+    else { q.opts = engOpts(); q.ans = w; }
   } else if (type === "blank") {
     q.limit = 15; q.sent = blankOut(t.s, w); q.opts = engOpts(); q.ans = w;
   } else if (type === "puzzle") {
