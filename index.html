@@ -1621,10 +1621,14 @@ function blankOut(s, w) { return s.replace(new RegExp("\\b" + w + "\\b", "i"), "
 
 /* ===================== 문제 만들기 ===================== */
 /* ===================== 난이도 ===================== */
-const T_BASE = ["ox", "meaning", "listen", "word", "puzzle", "blank", "match", "ox", "listen", "blank", "puzzle", "boss"];
-const T_MID = ["ox", "meaning", "listen", "word", "puzzle", "blank", "match", "boss", "listen", "blank", "puzzle", "boss"];
-const T_HARD = ["meaning", "listen", "word", "puzzle", "blank", "match", "boss", "listen", "blank", "puzzle", "boss", "boss"];
-const T_MAX = ["listen", "word", "boss", "blank", "match", "puzzle", "boss", "listen", "blank", "boss", "puzzle", "boss"];
+/* 객관식: ox, meaning, word, listen, blank · 반쯤 철자: match, puzzle · 철자 직접 쓰기: boss(뜻 보고), dictation(듣고), sentspell(문장 보고) */
+const T_BASE = ["ox", "meaning", "listen", "word", "puzzle", "blank", "match", "boss", "dictation", "blank", "puzzle", "sentspell"];
+const T_MID = ["meaning", "listen", "word", "puzzle", "blank", "match", "boss", "dictation", "sentspell", "puzzle", "boss", "dictation"];
+const T_HARD = ["meaning", "listen", "word", "dictation", "blank", "match", "boss", "sentspell", "puzzle", "dictation", "boss", "sentspell"];
+const T_MAX = ["listen", "word", "dictation", "boss", "sentspell", "match", "dictation", "boss", "sentspell", "puzzle", "dictation", "boss"];
+/* 배점: 정답 기본 점수 (빨리 풀면 기본 점수의 절반까지 보너스) */
+const BASE = { ox: 40, meaning: 50, word: 50, listen: 60, blank: 60, match: 80, puzzle: 120, boss: 200, dictation: 200, sentspell: 200 };
+const SPELL = ["boss", "dictation", "sentspell"];
 /* mix = 새 단어 8개를 [중1, 중2~3, 고1]에서 몇 개씩 */
 const LEVELS = {
   1: { name: "중1", desc: "중1 단어 · 기본 시간 · 쉬운 문제 구성", mix: [8, 0, 0], time: 1, study: 90, decoy: 0, types: T_BASE },
@@ -1636,7 +1640,7 @@ const LEVELS = {
 const LV_SCHEME = 2;
 const OLD_LV = { 1: 1, 2: 1, 3: 2, 4: 3, 5: 3 };   // 예전 난이도 번호 → 새 번호
 const lvOf = x => LEVELS[x] ? +x : 2;
-const TYPE_LABEL = { ox: "⚡ 스피드 O/X", meaning: "🧠 뜻 고르기", word: "🔤 단어 고르기", listen: "🎧 듣고 고르기", puzzle: "🧩 철자 퍼즐", blank: "📝 빈칸 채우기", match: "🔗 짝 맞추기", boss: "👾 보스 (점수 2배)" };
+const TYPE_LABEL = { ox: "⚡ 스피드 O/X", meaning: "🧠 뜻 고르기", word: "🔤 단어 고르기", listen: "🎧 듣고 고르기", puzzle: "🧩 철자 퍼즐", blank: "📝 빈칸 채우기", match: "🔗 짝 맞추기", boss: "👾 철자 쓰기 (뜻 보고)", dictation: "🎧 받아쓰기", sentspell: "✍️ 문장 완성 (철자)" };
 
 function dayWords(date, review, lv) {
   const L = LEVELS[lv];
@@ -1677,7 +1681,7 @@ function buildQuiz(date, plan) {
   const { fresh, review, extra, r } = dayWords(date, plan.review, lv);
   const all = [...fresh, ...review, ...extra];
   let pool = shuffle(all, r);
-  const shortSlots = TYPES.map((t, i) => (t === "puzzle" || t === "boss") ? i : -1).filter(i => i >= 0);
+  const shortSlots = TYPES.map((t, i) => (t === "puzzle" || SPELL.includes(t)) ? i : -1).filter(i => i >= 0);
   const shorts = pool.filter(w => w.length >= 4 && w.length <= (lv >= 4 ? 11 : 9)).slice(0, shortSlots.length);
   const assign = new Array(TYPES.length);
   shortSlots.forEach((s, i) => { if (shorts[i]) assign[s] = shorts[i]; });
@@ -1694,18 +1698,18 @@ function makeQ(type, w, r, dayPool, lv) {
   const dd = k => pickDistractors(w, k, r, [], dayPool);
   const engOpts = () => shuffle([w, ...dd(3)], r);
   if (type === "ox") {
-    q.limit = 6; q.truth = r() < 0.5;
+    q.limit = 4; q.truth = r() < 0.5;
     q.shown = q.truth ? t.m : WMAP[dd(1)[0]].m;
   } else if (type === "meaning") {
-    q.limit = 10; q.opts = shuffle([w, ...dd(3)], r).map(x => WMAP[x].m); q.ans = t.m;
+    q.limit = 6; q.opts = shuffle([w, ...dd(3)], r).map(x => WMAP[x].m); q.ans = t.m;
   } else if (type === "word") {
-    q.limit = 10; q.opts = engOpts(); q.ans = w;
+    q.limit = 6; q.opts = engOpts(); q.ans = w;
   } else if (type === "listen") {
-    q.limit = 12;
+    q.limit = 8;
     if (hard) { q.meaningMode = true; q.opts = shuffle([w, ...dd(3)], r).map(x => WMAP[x].m); q.ans = t.m; }
     else { q.opts = engOpts(); q.ans = w; }
   } else if (type === "blank") {
-    q.limit = 15; q.sent = blankOut(t.s, w); q.opts = engOpts(); q.ans = w;
+    q.limit = 9; q.sent = blankOut(t.s, w); q.opts = engOpts(); q.ans = w;
   } else if (type === "puzzle") {
     q.limit = Math.round(12 + w.length * 2 + L.decoy * 2);
     const letters = w.split("");
@@ -1714,12 +1718,16 @@ function makeQ(type, w, r, dayPool, lv) {
     do { tiles = shuffle(letters, r); tries++; } while (tiles.join("").startsWith(w) && tries < 10 && w.length > 1);
     q.tiles = tiles;
   } else if (type === "match") {
-    q.limit = 25;
+    q.limit = 20;
     const others = pickDistractors(w, 3, r, []).filter(Boolean);
     const fromDay = shuffle(dayPool.filter(x => x !== w && !overlap(WMAP[x].m, t.m)), r);
     const chosen = [w];
     for (const x of [...fromDay, ...others]) { if (chosen.length >= 4) break; if (!chosen.some(c => overlap(WMAP[c].m, WMAP[x].m))) chosen.push(x); }
     q.left = shuffle(chosen, r); q.right = shuffle(chosen, r);
+  } else if (type === "dictation") {
+    q.limit = Math.round(12 + w.length * 1.6); q.firstHint = lv <= 2;
+  } else if (type === "sentspell") {
+    q.limit = Math.round(12 + w.length * 1.6); q.firstHint = lv <= 3; q.sent = blankOut(t.s, w);
   } else if (type === "boss") {
     q.limit = Math.round(10 + w.length * 1.6); q.firstHint = lv <= 3;
   }
@@ -2020,7 +2028,7 @@ function viewSet() {
   <div class="sub">이달의 MVP</div><input class="txt" id="pz-m" value="${esc(st.monthlyPrize)}">
   <h3>⚖️ 핸디캡 (하루 점수에 더해 줄 보너스)</h3>
   <div class="row">${PIDS.map(p => `<div style="flex:1"><div class="sub">${P(p).emoji} ${esc(P(p).name)}</div><input class="txt" id="bn-${p}" type="number" inputmode="numeric" value="${(st.bonus || {})[p] || 0}"></div>`).join("")}</div>
-  <div class="sub">한쪽이 계속 지면 보너스 점수로 균형을 맞춰 보세요. (최고 점수는 난이도에 따라 하루 약 2,300~2,700점)</div>
+  <div class="sub">한쪽이 계속 지면 보너스 점수로 균형을 맞춰 보세요. (하루 최고 점수는 난이도에 따라 약 2,300~3,300점. 철자 쓰기 1문제 최대 300점, 객관식 1문제 최대 60~90점)</div>
   <button class="btn small" data-act="saveSet">저장</button>`
     : `<div class="prize">${esc(st.dailyPrize)}</div><div class="prize">${esc(st.weeklyPrize)}</div><div class="prize">${esc(st.monthlyPrize)}</div>
   <h3>⚖️ 핸디캡</h3><div class="row between jua" style="font-size:18px">${PIDS.map(p => `<span>${P(p).emoji} +${(st.bonus || {})[p] || 0}점</span>`).join("")}</div>`;
@@ -2138,11 +2146,14 @@ function showQ() {
   else if (q.type === "blank") body = `<div class="sentence">${esc(q.sent).replace("_____", "<u>_____</u>")}</div><div class="hint">빈칸에 들어갈 단어는?</div><div class="opts">${q.opts.map((o, i) => `<button class="opt" data-act="opt" data-i="${i}">${esc(o)}</button>`).join("")}</div>`;
   else if (q.type === "puzzle") body = `<div class="prompt ko">${esc(t.m)}</div><div class="hint">글자를 순서대로 눌러 단어를 완성하세요 (칸을 누르면 지워져요)${q.tiles.length > q.w.length ? "<br>⚠️ 필요 없는 함정 글자가 섞여 있어요!" : ""}</div><div id="pzarea"></div>`;
   else if (q.type === "match") body = `<div class="hint" style="margin-top:12px">영어와 뜻을 짝지어 주세요! 틀리면 감점</div><div id="marea"></div>`;
-  else if (q.type === "boss") body = `<div class="prompt ko">👾 ${esc(t.m)}</div><div class="hint">철자를 직접 입력! ${q.firstHint ? `첫 글자 <b>${esc(q.w[0])}</b> · ` : ""}${q.w.length}글자</div><div id="kbarea"></div>`;
+  else if (q.type === "dictation") body = `<button class="speaker" data-act="sayq" style="width:96px;height:96px;font-size:44px">🔊</button><div class="hint">들리는 단어의 철자를 쓰세요! ${q.firstHint ? `첫 글자 <b>${esc(q.w[0])}</b> · ` : ""}${q.w.length}글자 <span class="pill">최대 ${BASE.dictation * 1.5}점</span></div><div id="kbarea"></div>`;
+  else if (q.type === "sentspell") body = `<div class="sentence" style="font-size:19px;margin:8px 0">${esc(q.sent).replace("_____", "<u>_____</u>")}</div><div class="hint">뜻: <b>${esc(t.m)}</b> · ${q.firstHint ? `첫 글자 <b>${esc(q.w[0])}</b> · ` : ""}${q.w.length}글자 <span class="pill">최대 ${BASE.sentspell * 1.5}점</span></div><div id="kbarea"></div>`;
+  else if (q.type === "boss") body = `<div class="prompt ko">👾 ${esc(t.m)}</div><div class="hint">철자를 직접 입력! ${q.firstHint ? `첫 글자 <b>${esc(q.w[0])}</b> · ` : ""}${q.w.length}글자 <span class="pill">최대 ${BASE.boss * 1.5}점</span></div><div id="kbarea"></div>`;
   app.innerHTML = head + `<div id="qb">${body}</div>`;
   if (q.type === "puzzle") drawPuzzle();
   if (q.type === "match") drawMatch();
-  if (q.type === "boss") drawKb();
+  if (SPELL.includes(q.type)) drawKb();
+  if (q.type === "dictation") setTimeout(() => speak(q.w), 250);
   if (q.type === "listen") setTimeout(() => speak(q.w), 250);
   clearInterval(g.tick); let lastSec = 99;
   g.tick = setInterval(() => {
@@ -2157,7 +2168,7 @@ function showQ() {
 
 function timeUp() {
   const g = S.game, q = g.qs[g.idx]; if (g.locked) return;
-  if (q.type === "match") { const n = g.mm.done.length; const wr = q.left.filter(w => !g.mm.done.includes(w)); return answer(false, { pts: n * 25, wrongs: [...new Set([...wr, ...g.mm.wrongs])], timeout: true }); }
+  if (q.type === "match") { const n = g.mm.done.length; const wr = q.left.filter(w => !g.mm.done.includes(w)); return answer(false, { pts: n * BASE.match / 4, wrongs: [...new Set([...wr, ...g.mm.wrongs])], timeout: true }); }
   answer(false, { timeout: true });
 }
 
@@ -2166,8 +2177,8 @@ function answer(ok, extra = {}) {
   const ms = Math.min(now() - g.qStart, q.limit * 1000), remain = q.limit * 1000 - ms;
   let pts = extra.pts || 0, cb = 0;
   if (ok) {
-    const base = extra.base ?? 100, mult = q.type === "boss" ? 2 : 1;
-    pts = Math.round((base + speedBonus(remain, q.limit * 1000)) * mult);
+    const base = extra.base ?? BASE[q.type] ?? 100;
+    pts = Math.round(base + base / 2 * Math.max(0, Math.min(1, remain / (q.limit * 1000))));
     if (extra.keepCombo !== false) { g.combo++; cb = comboBonus(g.combo); } else g.combo = 0;
     pts += cb;
   } else g.combo = 0;
@@ -2225,7 +2236,7 @@ function matchTap(side, w, el) {
   if (!m.sel) { toast("왼쪽 영어 단어를 먼저 골라요", 1200); return; }
   if (m.sel === w) {
     m.done.push(w); m.sel = null; beep([700, 900], .07);
-    if (m.done.length === q.left.length) return answer(true, { base: Math.max(25, 100 - 25 * m.mistakes), keepCombo: m.mistakes === 0, wrongs: m.wrongs });
+    if (m.done.length === q.left.length) return answer(true, { base: Math.max(BASE.match / 4, BASE.match - BASE.match / 4 * m.mistakes), keepCombo: m.mistakes === 0, wrongs: m.wrongs });
     drawMatch();
   } else {
     m.mistakes++; m.wrongs.push(m.sel); el.classList.add("err", "shake"); SFX.bad(); vibrate(80); m.sel = null;
